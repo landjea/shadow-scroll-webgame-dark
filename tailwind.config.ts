@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -64,12 +63,12 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				game: {
-					dark: '#1A1F2C',
-					darker: '#161A24',
-					accent: '#6E87B8',
-					highlight: '#38BEC9',
-					text: '#E2E8F0',
-					muted: '#8A939E'
+					dark: '#0A1128',
+					darker: '#060A16',
+					accent: '#D946EF',
+					highlight: '#0EA5E9',
+					text: '#F0F4F8',
+					muted: '#8B5CF6'
 				}
 			},
 			fontFamily: {

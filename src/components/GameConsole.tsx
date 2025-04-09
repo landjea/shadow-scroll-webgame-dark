@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronRight, CornerDownRight } from "lucide-react";
+import { CornerDownRight } from "lucide-react";
 
 interface TextLine {
   id: number;
@@ -18,18 +18,22 @@ const GameConsole: React.FC = () => {
   ]);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  const handleSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== 'Enter') return;
+    
+    const target = e.target as HTMLInputElement;
+    const inputValue = target.value;
+    
+    if (!inputValue.trim()) return;
     
     // Add player input to history
     const newId = history.length > 0 ? history[history.length - 1].id + 1 : 1;
-    setHistory([...history, { id: newId, content: input, type: 'player' }]);
+    setHistory([...history, { id: newId, content: inputValue, type: 'player' }]);
     
     // Process command and generate response
     setTimeout(() => {
       let response: string;
-      const command = input.toLowerCase();
+      const command = inputValue.toLowerCase();
       
       if (command.includes("look") || command.includes("examine")) {
         response = "The forest is dense and dark. You can see a faint path leading north, and something shiny glinting between the roots of a nearby tree.";
@@ -44,7 +48,8 @@ const GameConsole: React.FC = () => {
       setHistory(prev => [...prev, { id: newId + 1, content: response, type: 'response' }]);
     }, 500);
     
-    setInput("");
+    // Clear input
+    target.value = "";
   };
   
   // Scroll to bottom when history updates
@@ -66,7 +71,7 @@ const GameConsole: React.FC = () => {
               key={line.id}
               className={`animate-text-appear pb-1 ${
                 line.type === 'player' 
-                  ? 'flex items-start pl-3 text-game-accent font-mono' 
+                  ? 'flex items-start text-game-accent font-mono' 
                   : line.type === 'system'
                   ? 'text-game-highlight font-mono'
                   : 'font-mono'
@@ -81,21 +86,16 @@ const GameConsole: React.FC = () => {
         </div>
       </ScrollArea>
       
-      <div className="p-4 border-t border-game-dark/80">
-        <form onSubmit={handleSubmit} className="flex items-center">
-          <ChevronRight className="text-game-accent mr-2" size={20} />
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="flex-1 bg-transparent border-none outline-none font-mono text-game-text placeholder-game-muted"
-            placeholder="Enter your action..."
-            autoComplete="off"
-          />
-        </form>
-      </div>
+      <input
+        type="text"
+        onKeyDown={handleSubmit}
+        className="w-full bg-game-darker text-game-text font-mono p-2 border-t border-game-dark/80 outline-none"
+        placeholder="Enter your action..."
+        autoComplete="off"
+      />
     </div>
   );
 };
 
 export default GameConsole;
+
