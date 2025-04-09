@@ -1,49 +1,82 @@
 
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Book, Map, User, Briefcase } from "lucide-react";
-
-interface NavigationItem {
-  name: string;
-  icon: React.ReactNode;
-}
+import { User, Shield, Zap, Award, Star, Flame, BookOpen } from "lucide-react";
 
 const GameSidebar: React.FC = () => {
-  const navigationItems: NavigationItem[] = [
+  const heroStats = [
+    { name: "Strength", value: 75 },
+    { name: "Agility", value: 85 },
+    { name: "Intelligence", value: 70 },
+    { name: "Defense", value: 60 },
+    { name: "Speed", value: 90 }
+  ];
+  
+  const abilities = [
+    { name: "Super Strength", icon: <Shield size={16} className="text-game-highlight" /> },
+    { name: "Energy Blast", icon: <Zap size={16} className="text-yellow-500" /> },
+    { name: "Flight", icon: <Flame size={16} className="text-red-500" /> },
+    { name: "Invulnerability", icon: <Star size={16} className="text-purple-400" /> }
+  ];
+  
+  const navigationTabs = [
     { name: "Character", icon: <User size={18} /> },
-    { name: "Inventory", icon: <Briefcase size={18} /> },
-    { name: "Journal", icon: <Book size={18} /> },
-    { name: "Map", icon: <Map size={18} /> }
+    { name: "Abilities", icon: <Zap size={18} /> },
+    { name: "Missions", icon: <Award size={18} /> },
+    { name: "Story", icon: <BookOpen size={18} /> }
   ];
 
   return (
     <div className="h-full w-full bg-game-darker border-r border-game-dark/80 flex flex-col">
       <div className="p-4 border-b border-game-dark/80">
-        <h2 className="font-mono text-game-highlight text-sm mb-2">PLAYER STATUS</h2>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-game-muted">Health:</span>
-            <span>100/100</span>
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="w-12 h-12 rounded-full bg-game-accent flex items-center justify-center">
+            <User size={24} className="text-game-darker" />
           </div>
-          <div className="flex justify-between">
-            <span className="text-game-muted">Energy:</span>
-            <span>75/100</span>
+          <div>
+            <h2 className="font-bold text-game-highlight">Captain Bolt</h2>
+            <p className="text-xs text-game-muted">Level 5 Superhero</p>
           </div>
-          <div className="flex justify-between">
-            <span className="text-game-muted">Gold:</span>
-            <span>50</span>
-          </div>
+        </div>
+        
+        <div className="space-y-3">
+          {heroStats.map((stat) => (
+            <div key={stat.name}>
+              <div className="flex justify-between text-xs">
+                <span className="text-game-muted">{stat.name}</span>
+                <span className="text-game-text">{stat.value}/100</span>
+              </div>
+              <div className="w-full bg-game-dark rounded-full h-1.5 mt-1">
+                <div 
+                  className="bg-game-accent h-1.5 rounded-full" 
+                  style={{ width: `${stat.value}%` }}
+                ></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <div className="p-4 border-b border-game-dark/80">
+        <h3 className="font-semibold text-game-highlight text-sm mb-3">HERO ABILITIES</h3>
+        <div className="space-y-2">
+          {abilities.map((ability) => (
+            <div key={ability.name} className="flex items-center space-x-2 bg-game-dark/50 p-2 rounded">
+              {ability.icon}
+              <span className="text-sm">{ability.name}</span>
+            </div>
+          ))}
         </div>
       </div>
       
       <nav className="p-4">
-        <h2 className="font-mono text-game-highlight text-sm mb-3">NAVIGATION</h2>
+        <h3 className="font-semibold text-game-highlight text-sm mb-3">NAVIGATION</h3>
         <ul className="space-y-2">
-          {navigationItems.map((item) => (
-            <li key={item.name}>
+          {navigationTabs.map((tab) => (
+            <li key={tab.name}>
               <button className="w-full text-left px-3 py-2 rounded flex items-center space-x-3 text-game-muted hover:bg-game-dark hover:text-game-text transition-colors">
-                <span>{item.icon}</span>
-                <span className="font-mono text-sm">{item.name}</span>
+                <span>{tab.icon}</span>
+                <span className="font-mono text-sm">{tab.name}</span>
               </button>
             </li>
           ))}
@@ -51,9 +84,14 @@ const GameSidebar: React.FC = () => {
       </nav>
       
       <div className="mt-auto p-4 border-t border-game-dark/80">
-        <h2 className="font-mono text-game-highlight text-sm mb-2">LOCATION</h2>
-        <p className="text-sm font-mono">The Dark Forest</p>
-        <p className="text-xs text-game-muted mt-1 font-mono">Unexplored Territory</p>
+        <h3 className="font-semibold text-game-highlight text-sm mb-2">CURRENT MISSION</h3>
+        <p className="text-sm">Stop the bank robbery downtown</p>
+        <div className="flex items-center space-x-2 mt-2">
+          <div className="w-full bg-game-dark rounded-full h-1.5">
+            <div className="bg-yellow-500 h-1.5 rounded-full w-2/3"></div>
+          </div>
+          <span className="text-xs text-game-muted">66%</span>
+        </div>
       </div>
     </div>
   );
