@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { User, Shield, Zap, Award, Star, Flame, BookOpen } from "lucide-react";
+import { User, Shield, Zap, Award, Star, Flame, BookOpen, ChevronRight } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const GameSidebar: React.FC = () => {
   const heroStats = [
@@ -29,44 +30,69 @@ const GameSidebar: React.FC = () => {
   return (
     <div className="h-full w-full bg-game-darker border-r border-game-dark/80 flex flex-col">
       <div className="p-4 border-b border-game-dark/80">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-12 h-12 rounded-full bg-game-accent flex items-center justify-center">
-            <User size={24} className="text-game-darker" />
-          </div>
-          <div>
-            <h2 className="font-bold text-game-highlight">Captain Bolt</h2>
-            <p className="text-xs text-game-muted">Level 5 Superhero</p>
-          </div>
-        </div>
-        
-        <div className="space-y-3">
-          {heroStats.map((stat) => (
-            <div key={stat.name}>
-              <div className="flex justify-between text-xs">
-                <span className="text-game-muted">{stat.name}</span>
-                <span className="text-game-text">{stat.value}/100</span>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="w-full flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 rounded-full bg-game-accent flex items-center justify-center">
+                  <User size={24} className="text-game-darker" />
+                </div>
+                <div>
+                  <h2 className="font-bold text-game-highlight">Captain Bolt</h2>
+                  <p className="text-xs text-game-muted">Level 5 Superhero</p>
+                </div>
               </div>
-              <div className="w-full bg-game-dark rounded-full h-1.5 mt-1">
-                <div 
-                  className="bg-game-accent h-1.5 rounded-full" 
-                  style={{ width: `${stat.value}%` }}
-                ></div>
+              <ChevronRight size={16} className="text-game-muted" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-0 bg-game-dark border border-game-dark/80" align="start">
+            <div className="p-4 bg-game-darker border-b border-game-dark/80">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-14 h-14 rounded-full bg-game-accent flex items-center justify-center">
+                  <User size={28} className="text-game-darker" />
+                </div>
+                <div>
+                  <h2 className="font-bold text-lg text-game-highlight">Captain Bolt</h2>
+                  <p className="text-sm text-game-muted">Level 5 Superhero</p>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-      
-      <div className="p-4 border-b border-game-dark/80">
-        <h3 className="font-semibold text-game-highlight text-sm mb-3">HERO ABILITIES</h3>
-        <div className="space-y-2">
-          {abilities.map((ability) => (
-            <div key={ability.name} className="flex items-center space-x-2 bg-game-dark/50 p-2 rounded">
-              {ability.icon}
-              <span className="text-sm">{ability.name}</span>
-            </div>
-          ))}
-        </div>
+            
+            <ScrollArea className="h-[350px]">
+              <div className="p-4 border-b border-game-dark/80">
+                <h3 className="font-semibold text-game-highlight text-sm mb-3">HERO STATS</h3>
+                <div className="space-y-3">
+                  {heroStats.map((stat) => (
+                    <div key={stat.name}>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-game-muted">{stat.name}</span>
+                        <span className="text-game-text">{stat.value}/100</span>
+                      </div>
+                      <div className="w-full bg-game-dark rounded-full h-1.5 mt-1">
+                        <div 
+                          className="bg-game-accent h-1.5 rounded-full" 
+                          style={{ width: `${stat.value}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="p-4">
+                <h3 className="font-semibold text-game-highlight text-sm mb-3">HERO ABILITIES</h3>
+                <div className="space-y-2">
+                  {abilities.map((ability) => (
+                    <div key={ability.name} className="flex items-center space-x-2 bg-game-dark/50 p-2 rounded">
+                      {ability.icon}
+                      <span className="text-sm">{ability.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </ScrollArea>
+          </PopoverContent>
+        </Popover>
       </div>
       
       <nav className="p-4">
