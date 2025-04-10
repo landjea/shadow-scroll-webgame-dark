@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MapPin, Building, Car as RoadIcon, Park, Shield as PoliceIcon, Hospital as HospitalIcon } from 'lucide-react';
+import { MapPin, Building, Car as RoadIcon, Trees as Park, Shield as PoliceIcon, Hospital as HospitalIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface LocationType {
