@@ -25,6 +25,15 @@
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
     --radius: 0.5rem;
+    
+    /* Sunset color palette */
+    --sunset-dark: #2F2E33;
+    --sunset-purple: #5B3C80;
+    --sunset-purple-light: #744C9E;
+    --sunset-red: #FE5F55;
+    --sunset-green: #BCD8C1;
+    --sunset-white: #F0EBF4;
+    --sunset-grey: #A3A1A8;
   }
 
   * {

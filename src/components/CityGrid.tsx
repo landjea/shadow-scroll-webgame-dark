@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapPin, Building, Car as RoadIcon, Trees as Park, Shield as PoliceIcon, Hospital as HospitalIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -50,6 +50,64 @@ const CityGrid: React.FC<CityGridProps> = ({
   heroStamina,
   onLocationSelect,
 }) => {
+  const [centeredGrid, setCenteredGrid] = useState<LocationType[][]>([]);
+  const gridSize = 7; // Total grid size (7x7)
+  const radius = Math.floor(gridSize / 2); // How far the grid extends from center (3 in each direction)
+
+  useEffect(() => {
+    // Generate a centered grid based on the current player position
+    const newGrid: LocationType[][] = [];
+    for (let y = 0; y < gridSize; y++) {
+      const row: LocationType[] = [];
+      
+      // Calculate the world-space y coordinate
+      const worldY = currentLocation.y + (y - radius);
+      
+      for (let x = 0; x < gridSize; x++) {
+        // Calculate the world-space x coordinate
+        const worldX = currentLocation.x + (x - radius);
+        
+        // Find if there's a location at these coordinates in the original grid
+        let location: LocationType | undefined;
+        
+        if (worldY >= 0 && worldY < grid.length && 
+            worldX >= 0 && worldX < grid[0].length) {
+          location = grid[worldY][worldX];
+        }
+        
+        // If location doesn't exist, generate a new one
+        if (!location) {
+          const types: LocationType['type'][] = ['hospital', 'police', 'mall', 'suburb', 'park', 'street'];
+          const locationNames: Record<LocationType['type'], string[]> = {
+            hospital: ['Central Hospital', 'Mercy Hospital', 'City Medical'],
+            police: ['Police HQ', 'Precinct 99', 'Sheriff Office'],
+            mall: ['Mega Mall', 'City Center', 'Shopping Plaza'],
+            suburb: ['Green Hills', 'Pleasant View', 'Oak District'],
+            park: ['Central Park', 'Rose Garden', 'Lakeside Park'],
+            street: ['Main St.', 'Broadway', 'Bay Avenue']
+          };
+          
+          const type = types[Math.floor(Math.random() * types.length)];
+          const nameOptions = locationNames[type];
+          const name = nameOptions[Math.floor(Math.random() * nameOptions.length)];
+          
+          location = {
+            id: `loc-${worldX}-${worldY}`,
+            name,
+            type,
+            x: worldX,
+            y: worldY
+          };
+        }
+        
+        row.push(location);
+      }
+      newGrid.push(row);
+    }
+    
+    setCenteredGrid(newGrid);
+  }, [currentLocation, grid]);
+
   const isLocationReachable = (location: LocationType): boolean => {
     if (location.x === currentLocation.x && location.y === currentLocation.y) {
       return false; // Current location is not reachable (already there)
@@ -62,8 +120,8 @@ const CityGrid: React.FC<CityGridProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-7 gap-1 p-2 bg-blue-950 rounded-md border border-blue-900/50">
-      {grid.map((row, rowIndex) => (
+    <div className="grid grid-cols-7 gap-1 p-2 rounded-md border" style={{ background: "#2F2E33", borderColor: "#2F2E33" }}>
+      {centeredGrid.map((row, rowIndex) => (
         <React.Fragment key={`row-${rowIndex}`}>
           {row.map((location) => {
             const isCurrent = location.x === currentLocation.x && location.y === currentLocation.y;
@@ -71,13 +129,13 @@ const CityGrid: React.FC<CityGridProps> = ({
             
             return (
               <button
-                key={location.id}
+                key={`${location.id}-${location.x}-${location.y}`}
                 onClick={() => isReachable && onLocationSelect(location)}
                 className={cn(
                   "relative h-12 p-1 rounded flex flex-col items-center justify-center text-xs transition-all",
-                  isCurrent ? "bg-blue-500 text-white" : 
-                    isReachable ? "bg-blue-900 hover:bg-blue-800 text-blue-100" : 
-                    "bg-blue-950/50 text-blue-500/50 cursor-not-allowed"
+                  isCurrent ? "bg-[#FE5F55] text-white" : 
+                    isReachable ? "bg-[#5B3C80] hover:bg-[#744C9E] text-[#F0EBF4]" : 
+                    "bg-[#2F2E33]/70 text-[#A3A1A8]/50 cursor-not-allowed"
                 )}
                 disabled={!isReachable && !isCurrent}
               >
@@ -85,7 +143,7 @@ const CityGrid: React.FC<CityGridProps> = ({
                   type={location.type} 
                   className={cn(
                     isCurrent ? "text-white" : 
-                      isReachable ? "text-game-accent" : "text-blue-500/50"
+                      isReachable ? "text-[#BCD8C1]" : "text-[#A3A1A8]/50"
                   )} 
                 />
                 <div className="text-[9px] mt-0.5">

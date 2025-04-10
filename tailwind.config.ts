@@ -69,6 +69,15 @@ export default {
 					highlight: '#0EA5E9',
 					text: '#F0F4F8',
 					muted: '#8B5CF6'
+				},
+				sunset: {
+					dark: '#2F2E33',
+					purple: '#5B3C80',
+					'purple-light': '#744C9E',
+					red: '#FE5F55',
+					green: '#BCD8C1',
+					white: '#F0EBF4',
+					grey: '#A3A1A8'
 				}
 			},
 			fontFamily: {
