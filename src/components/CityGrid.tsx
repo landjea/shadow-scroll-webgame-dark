@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MapPin, Hospital, Police, Building, ParkIcon, Road } from 'lucide-react';
+import { MapPin, Building, Car as RoadIcon, Park, Shield as PoliceIcon, Hospital as HospitalIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface LocationType {
@@ -19,17 +19,17 @@ interface LocationIconProps {
 const LocationIcon: React.FC<LocationIconProps> = ({ type, className }) => {
   switch (type) {
     case 'hospital':
-      return <Hospital className={cn("h-4 w-4", className)} />;
+      return <HospitalIcon className={cn("h-4 w-4", className)} />;
     case 'police':
-      return <Police className={cn("h-4 w-4", className)} />;
+      return <PoliceIcon className={cn("h-4 w-4", className)} />;
     case 'mall':
       return <Building className={cn("h-4 w-4", className)} />;
     case 'suburb':
       return <MapPin className={cn("h-4 w-4", className)} />;
     case 'park':
-      return <ParkIcon className={cn("h-4 w-4", className)} />;
+      return <Park className={cn("h-4 w-4", className)} />;
     case 'street':
-      return <Road className={cn("h-4 w-4", className)} />;
+      return <RoadIcon className={cn("h-4 w-4", className)} />;
     default:
       return <MapPin className={cn("h-4 w-4", className)} />;
   }
