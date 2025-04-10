@@ -1,14 +1,18 @@
 
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { User, Shield, Zap, Award, Star, Flame, BookOpen, ChevronRight, Activity } from "lucide-react";
+import { User, Shield, Zap, Award, Star, Flame, BookOpen, ChevronRight, Activity, Settings } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface GameSidebarProps {
   heroSpeed: number;
 }
 
 const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const heroStats = [
     { name: "Strength", value: 75 },
     { name: "Speed", value: heroSpeed * 20 }, // Convert speed to a 0-100 scale
@@ -25,11 +29,16 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed }) => {
   ];
   
   const navigationTabs = [
-    { name: "Character", icon: <User size={18} /> },
-    { name: "Abilities", icon: <Zap size={18} /> },
-    { name: "Missions", icon: <Award size={18} /> },
-    { name: "Story", icon: <BookOpen size={18} /> }
+    { name: "Character", icon: <User size={18} />, path: "/" },
+    { name: "Abilities", icon: <Zap size={18} />, path: "/" },
+    { name: "Missions", icon: <Award size={18} />, path: "/" },
+    { name: "Story", icon: <BookOpen size={18} />, path: "/" },
+    { name: "Admin", icon: <Settings size={18} />, path: "/admin" }
   ];
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
 
   return (
     <div className="h-full w-full bg-purple-950 border-r border-purple-900/80 flex flex-col">
@@ -104,7 +113,10 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed }) => {
         <ul className="space-y-2">
           {navigationTabs.map((tab) => (
             <li key={tab.name}>
-              <button className="w-full text-left px-3 py-2 rounded flex items-center space-x-3 text-purple-400 hover:bg-purple-900 hover:text-purple-200 transition-colors">
+              <button 
+                className={`w-full text-left px-3 py-2 rounded flex items-center space-x-3 hover:bg-purple-900 hover:text-purple-200 transition-colors ${location.pathname === tab.path && tab.name === "Admin" ? "bg-purple-900 text-purple-200" : "text-purple-400"}`}
+                onClick={() => handleNavigation(tab.path)}
+              >
                 <span>{tab.icon}</span>
                 <span className="font-mono text-sm">{tab.name}</span>
               </button>
