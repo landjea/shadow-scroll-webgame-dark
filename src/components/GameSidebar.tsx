@@ -1,16 +1,20 @@
 
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { User, Shield, Zap, Award, Star, Flame, BookOpen, ChevronRight } from "lucide-react";
+import { User, Shield, Zap, Award, Star, Flame, BookOpen, ChevronRight, Activity } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-const GameSidebar: React.FC = () => {
+interface GameSidebarProps {
+  heroSpeed: number;
+}
+
+const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed }) => {
   const heroStats = [
     { name: "Strength", value: 75 },
+    { name: "Speed", value: heroSpeed * 20 }, // Convert speed to a 0-100 scale
     { name: "Agility", value: 85 },
     { name: "Intelligence", value: 70 },
-    { name: "Defense", value: 60 },
-    { name: "Speed", value: 90 }
+    { name: "Defense", value: 60 }
   ];
   
   const abilities = [

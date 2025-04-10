@@ -9,10 +9,17 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const Game: React.FC = () => {
   const isMobile = useIsMobile();
+  const [heroHealth, setHeroHealth] = useState(100);
+  const [heroEnergy, setHeroEnergy] = useState(100);
+  const [heroSpeed, setHeroSpeed] = useState(2);
   
   return (
     <div className="min-h-screen flex flex-col bg-game-dark text-game-text">
-      <GameHeader />
+      <GameHeader 
+        heroHealth={heroHealth}
+        heroEnergy={heroEnergy}
+        heroSpeed={heroSpeed}
+      />
       
       <div className="flex flex-1 pt-14">
         {isMobile ? (
@@ -26,12 +33,12 @@ const Game: React.FC = () => {
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-full max-w-xs bg-game-darker border-r border-game-dark/80">
-              <GameSidebar />
+              <GameSidebar heroSpeed={heroSpeed} />
             </SheetContent>
           </Sheet>
         ) : (
           <div className="w-64 h-[calc(100vh-3.5rem)]">
-            <GameSidebar />
+            <GameSidebar heroSpeed={heroSpeed} />
           </div>
         )}
         
