@@ -17,11 +17,16 @@ const formSchema = z.object({
   userEmail: z.string().email()
 });
 
+interface AdminUser {
+  id: string;
+  email: string;
+}
+
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [adminUsers, setAdminUsers] = useState<{ id: string; email: string }[]>([]);
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const { toast } = useToast();
   
   const form = useForm<z.infer<typeof formSchema>>({
@@ -47,21 +52,37 @@ const AdminPage: React.FC = () => {
       
       if (rolesError) throw rolesError;
       
-      if (adminRoles.length > 0) {
+      if (adminRoles && adminRoles.length > 0) {
         // Get user details for each admin
         const adminIds = adminRoles.map(role => role.user_id);
-        const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
         
-        if (authError) throw authError;
+        // Instead of using admin.listUsers (which requires admin privileges),
+        // we'll use what's already in the database
+        const adminList: AdminUser[] = [];
         
-        const admins = authUsers.users
-          .filter(user => adminIds.includes(user.id))
-          .map(user => ({
-            id: user.id,
-            email: user.email || 'Unknown'
-          }));
+        for (const id of adminIds) {
+          const { data: userProfile, error } = await supabase
+            .from('auth.users')
+            .select('email')
+            .eq('id', id)
+            .single();
+            
+          if (!error && userProfile) {
+            adminList.push({
+              id,
+              email: userProfile.email || 'Unknown'
+            });
+          } else {
+            adminList.push({
+              id,
+              email: 'User ' + id.substring(0, 8)
+            });
+          }
+        }
         
-        setAdminUsers(admins);
+        setAdminUsers(adminList);
+      } else {
+        setAdminUsers([]);
       }
     } catch (error) {
       console.error('Error loading admin users:', error);

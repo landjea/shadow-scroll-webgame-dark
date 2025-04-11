@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { LocationType } from '@/types/game';
 import { generateCityGrid } from '@/utils/mapUtils';
@@ -65,7 +64,6 @@ export function useGameState() {
     }
   ];
 
-  // Load game state on component mount
   useEffect(() => {
     if (user) {
       loadGameState();
@@ -74,12 +72,11 @@ export function useGameState() {
     }
   }, [user]);
 
-  // Save game state when important values change
   useEffect(() => {
     if (user && !loading) {
       saveGameState();
     }
-  }, [currentLocation, heroEnergy, heroHealth, heroSpeed, missionCount]);
+  }, [currentLocation, heroEnergy, heroHealth, heroSpeed, missionCount, user, loading]);
 
   const loadGameState = async () => {
     try {
@@ -99,7 +96,6 @@ export function useGameState() {
         const gameState = data.game_state as any;
         const playerData = data.player_data as any;
         
-        // Update state with saved data
         setCurrentLocation(gameState.currentLocation || cityGrid[3][3]);
         setGameStatus(gameState.gameStatus || "Ready for action! The city needs your help.");
         setActionLog(gameState.actionLog || ["You've started your hero journey in the city center."]);
@@ -129,8 +125,17 @@ export function useGameState() {
     try {
       if (!user) return;
       
+      const serializedLocation = {
+        id: currentLocation.id,
+        name: currentLocation.name,
+        type: currentLocation.type,
+        x: currentLocation.x,
+        y: currentLocation.y,
+        description: currentLocation.description
+      };
+      
       const gameState = {
-        currentLocation,
+        currentLocation: serializedLocation,
         gameStatus,
         actionLog
       };
@@ -221,10 +226,8 @@ export function useGameState() {
         break;
     }
     
-    // Add to action log
     setActionLog(prev => [newLogEntry, ...prev]);
     
-    // Log action to database
     logGameAction(actionId, payload);
   };
   
@@ -235,7 +238,6 @@ export function useGameState() {
       return;
     }
     
-    // Calculate Manhattan distance
     const distance = Math.abs(location.x - currentLocation.x) + Math.abs(location.y - currentLocation.y);
     
     if (distance > heroSpeed) {
@@ -250,7 +252,6 @@ export function useGameState() {
       return;
     }
     
-    // Update location and consume stamina
     setCurrentLocation(location);
     setHeroEnergy(prev => prev - distance);
     
@@ -258,7 +259,6 @@ export function useGameState() {
     setGameStatus(`You are now at ${location.name}.`);
     setActionLog(prev => [newLogEntry, ...prev]);
     
-    // Log action to database
     logGameAction('move', { from: currentLocation, to: location, energyUsed: distance });
   };
 
