@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { getUserEmail, getUserIdByEmail } from '@/integrations/supabase/custom-rpc';
 
 const formSchema = z.object({
   userEmail: z.string().email()
@@ -60,11 +60,11 @@ const AdminPage: React.FC = () => {
         const adminList: AdminUser[] = [];
         
         for (const id of adminIds) {
-          const { data: email } = await supabase.rpc('get_user_email', { user_id: id });
+          const email = await getUserEmail(id);
             
           adminList.push({
             id,
-            email: email || 'User ' + id.substring(0, 8)
+            email
           });
         }
         
@@ -88,12 +88,10 @@ const AdminPage: React.FC = () => {
     try {
       setLoading(true);
       
-      // First, we need to find the user by email
-      // This needs a custom RPC call since we can't directly query auth.users
-      const { data: userData, error: userError } = await supabase
-        .rpc('get_user_id_by_email', { email: values.userEmail });
+      // First, we need to find the user by email using our custom function
+      const userId = await getUserIdByEmail(values.userEmail);
       
-      if (userError || !userData) {
+      if (!userId) {
         toast({
           variant: 'destructive',
           title: 'User not found',
@@ -101,8 +99,6 @@ const AdminPage: React.FC = () => {
         });
         return;
       }
-      
-      const userId = userData;
       
       // Check if user is already an admin
       const { data: existingRole, error: checkError } = await supabase

@@ -94,6 +94,7 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) 
 
   return (
     <div className="h-full w-full bg-purple-950 border-r border-purple-900/80 flex flex-col">
+      {/* User Profile Section */}
       <div className="p-4 border-b border-purple-900/80">
         <Popover>
           <PopoverTrigger asChild>
@@ -164,6 +165,7 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) 
         </Popover>
       </div>
       
+      {/* Navigation Section */}
       <nav className="p-4">
         <h3 className="font-semibold text-purple-300 text-sm mb-3">NAVIGATION</h3>
         <ul className="space-y-2">
@@ -235,6 +237,7 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) 
         </ul>
       </nav>
       
+      {/* Current Mission Section */}
       <div className="mt-auto p-4 border-t border-purple-900/80">
         <h3 className="font-semibold text-purple-300 text-sm mb-2">CURRENT MISSION</h3>
         <p className="text-sm text-purple-200">Stop the bank robbery downtown</p>
