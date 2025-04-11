@@ -1,12 +1,176 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Package, Award, Zap, Shield, Map } from "lucide-react";
+import { User, Package, Award, Zap, Shield, Map, Loader2 } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+
+const formSchema = z.object({
+  userEmail: z.string().email()
+});
 
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [adminUsers, setAdminUsers] = useState<{ id: string; email: string }[]>([]);
+  const { toast } = useToast();
+  
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      userEmail: ''
+    }
+  });
+
+  useEffect(() => {
+    if (isAdmin) {
+      loadAdminUsers();
+    }
+  }, [isAdmin]);
+
+  const loadAdminUsers = async () => {
+    try {
+      setLoading(true);
+      const { data: adminRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('*')
+        .eq('role', 'admin');
+      
+      if (rolesError) throw rolesError;
+      
+      if (adminRoles.length > 0) {
+        // Get user details for each admin
+        const adminIds = adminRoles.map(role => role.user_id);
+        const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+        
+        if (authError) throw authError;
+        
+        const admins = authUsers.users
+          .filter(user => adminIds.includes(user.id))
+          .map(user => ({
+            id: user.id,
+            email: user.email || 'Unknown'
+          }));
+        
+        setAdminUsers(admins);
+      }
+    } catch (error) {
+      console.error('Error loading admin users:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to load admin users'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addAdmin = async (values: z.infer<typeof formSchema>) => {
+    try {
+      setLoading(true);
+      
+      // First, find the user by email
+      const { data: users, error: userError } = await supabase.auth.admin.listUsers();
+      
+      if (userError) throw userError;
+      
+      const user = users.users.find(u => u.email === values.userEmail);
+      
+      if (!user) {
+        toast({
+          variant: 'destructive',
+          title: 'User not found',
+          description: 'No user with that email exists'
+        });
+        return;
+      }
+      
+      // Check if user is already an admin
+      const { data: existingRole, error: checkError } = await supabase
+        .from('user_roles')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      
+      if (checkError) throw checkError;
+      
+      if (existingRole) {
+        toast({
+          title: 'Already an admin',
+          description: 'This user already has admin privileges'
+        });
+        return;
+      }
+      
+      // Add admin role
+      const { error: insertError } = await supabase
+        .from('user_roles')
+        .insert({
+          user_id: user.id,
+          role: 'admin'
+        });
+      
+      if (insertError) throw insertError;
+      
+      toast({
+        title: 'Admin added',
+        description: `${values.userEmail} is now an admin`
+      });
+      
+      form.reset();
+      loadAdminUsers();
+    } catch (error) {
+      console.error('Error adding admin:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to add admin role'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeAdmin = async (userId: string, email: string) => {
+    try {
+      setLoading(true);
+      
+      const { error } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId)
+        .eq('role', 'admin');
+      
+      if (error) throw error;
+      
+      toast({
+        title: 'Admin removed',
+        description: `${email} is no longer an admin`
+      });
+      
+      loadAdminUsers();
+    } catch (error) {
+      console.error('Error removing admin:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to remove admin role'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   
   const adminCards = [
     {
@@ -53,6 +217,66 @@ const AdminPage: React.FC = () => {
         <h1 className="text-3xl font-bold text-purple-800">Admin Dashboard</h1>
         <p className="text-gray-600">Manage your superhero game settings and configurations</p>
       </header>
+      
+      {/* Admin Role Management */}
+      <Card className="mb-8 border-t-4 border-purple-500">
+        <CardHeader>
+          <CardTitle>Admin Role Management</CardTitle>
+          <CardDescription>Add or remove admin privileges for users</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(addAdmin)} className="flex items-end gap-4 mb-6">
+              <FormField
+                control={form.control}
+                name="userEmail"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>User Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="user@example.com" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <Button 
+                type="submit" 
+                className="bg-purple-600 hover:bg-purple-700"
+                disabled={loading}
+              >
+                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Shield className="mr-2 h-4 w-4" />}
+                Add Admin
+              </Button>
+            </form>
+          </Form>
+          
+          <div className="bg-gray-50 rounded-md p-4">
+            <h3 className="text-lg font-medium mb-4">Current Admins</h3>
+            {loading ? (
+              <div className="text-center py-4">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto text-purple-600" />
+              </div>
+            ) : adminUsers.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">No admins found</p>
+            ) : (
+              <ul className="space-y-2">
+                {adminUsers.map(admin => (
+                  <li key={admin.id} className="flex justify-between items-center p-3 bg-white rounded-md shadow-sm">
+                    <span>{admin.email}</span>
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      onClick={() => removeAdmin(admin.id, admin.email)}
+                    >
+                      Remove
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </CardContent>
+      </Card>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {adminCards.map((card, index) => (

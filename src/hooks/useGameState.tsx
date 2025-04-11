@@ -3,13 +3,23 @@ import { useState, useEffect } from 'react';
 import { LocationType } from '@/types/game';
 import { generateCityGrid } from '@/utils/mapUtils';
 import { Shield, Zap, Target, Award, BookOpen } from "lucide-react";
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+
+interface GameState {
+  currentLocation: LocationType;
+  gameStatus: string;
+  actionLog: string[];
+  heroEnergy: number;
+  heroHealth: number;
+  heroSpeed: number;
+  missionCount: number;
+}
 
 export function useGameState() {
-  const [cityGrid, setCityGrid] = useState<LocationType[][]>(() => generateCityGrid(7));
-  const [currentLocation, setCurrentLocation] = useState<LocationType>(() => {
-    // Start at the center of the grid (3,3)
-    return cityGrid[3][3];
-  });
+  const cityGrid = generateCityGrid(7);
+  const [currentLocation, setCurrentLocation] = useState<LocationType>(cityGrid[3][3]);
   const [gameStatus, setGameStatus] = useState("Ready for action! The city needs your help.");
   const [actionLog, setActionLog] = useState<string[]>([
     "You've started your hero journey in the city center."
@@ -18,6 +28,9 @@ export function useGameState() {
   const [heroHealth, setHeroHealth] = useState(100);
   const [heroSpeed, setHeroSpeed] = useState(2);
   const [missionCount, setMissionCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const { toast } = useToast();
   
   const gameActions = [
     { 
@@ -51,20 +64,133 @@ export function useGameState() {
       description: 'Advance your hero\'s storyline and unlock new abilities.'
     }
   ];
+
+  // Load game state on component mount
+  useEffect(() => {
+    if (user) {
+      loadGameState();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
+
+  // Save game state when important values change
+  useEffect(() => {
+    if (user && !loading) {
+      saveGameState();
+    }
+  }, [currentLocation, heroEnergy, heroHealth, heroSpeed, missionCount]);
+
+  const loadGameState = async () => {
+    try {
+      if (!user) return;
+      
+      const { data, error } = await supabase
+        .from('game_saves')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('last_updated', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) throw error;
+      
+      if (data) {
+        const gameState = data.game_state as any;
+        const playerData = data.player_data as any;
+        
+        // Update state with saved data
+        setCurrentLocation(gameState.currentLocation || cityGrid[3][3]);
+        setGameStatus(gameState.gameStatus || "Ready for action! The city needs your help.");
+        setActionLog(gameState.actionLog || ["You've started your hero journey in the city center."]);
+        setHeroEnergy(playerData.energy || 100);
+        setHeroHealth(playerData.health || 100);
+        setHeroSpeed(playerData.speed || 2);
+        setMissionCount(playerData.missionCount || 0);
+        
+        toast({
+          title: "Game loaded!",
+          description: "Your saved game has been loaded."
+        });
+      }
+    } catch (error) {
+      console.error('Error loading game state:', error);
+      toast({
+        variant: 'destructive',
+        title: "Error",
+        description: "Failed to load game state"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveGameState = async () => {
+    try {
+      if (!user) return;
+      
+      const gameState = {
+        currentLocation,
+        gameStatus,
+        actionLog
+      };
+      
+      const playerData = {
+        energy: heroEnergy,
+        health: heroHealth,
+        speed: heroSpeed,
+        missionCount
+      };
+      
+      const { error } = await supabase
+        .from('game_saves')
+        .upsert({
+          user_id: user.id,
+          game_state: gameState,
+          player_data: playerData,
+          last_updated: new Date().toISOString()
+        });
+      
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error saving game state:', error);
+    }
+  };
+
+  const logGameAction = async (actionId: string, payload: any = {}) => {
+    try {
+      if (!user) return;
+      
+      const { error } = await supabase
+        .from('game_actions')
+        .insert({
+          user_id: user.id,
+          action_type: actionId,
+          payload
+        });
+      
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error logging game action:', error);
+    }
+  };
   
   const handleAction = (actionId: string) => {
     let newLogEntry = "";
+    let payload = {};
     
     switch(actionId) {
       case 'patrol':
         newLogEntry = "You patrol the streets of the city, deterring criminal activity.";
         setGameStatus(newLogEntry);
         setHeroEnergy(prev => Math.max(0, prev - 10));
+        payload = { location: currentLocation, energyUsed: 10 };
         break;
       case 'combat':
         newLogEntry = "You spend time at the training facility honing your superhero skills.";
         setGameStatus(newLogEntry);
         setHeroEnergy(prev => Math.max(0, prev - 15));
+        payload = { location: currentLocation, energyUsed: 15 };
         break;
       case 'mission':
         newLogEntry = `You accept a mission at ${currentLocation.name}!`;
@@ -72,22 +198,34 @@ export function useGameState() {
         setMissionCount(prev => prev + 1);
         setHeroEnergy(prev => Math.max(0, prev - 25));
         setHeroHealth(prev => Math.max(0, prev - 10));
+        payload = { 
+          location: currentLocation, 
+          energyUsed: 25, 
+          healthLost: 10,
+          missionCount: missionCount + 1 
+        };
         break;
       case 'rest':
         newLogEntry = "You take time to rest and recover your strength.";
         setGameStatus(newLogEntry);
         setHeroEnergy(100);
-        setHeroHealth(Math.min(100, heroHealth + 20));
+        const healthRecovered = Math.min(100, heroHealth + 20) - heroHealth;
+        setHeroHealth(prev => Math.min(100, prev + 20));
+        payload = { location: currentLocation, healthRecovered, energyRecovered: 100 - heroEnergy };
         break;
       case 'story':
         newLogEntry = "You delve deeper into your hero's journey, uncovering new aspects of your origin story.";
         setGameStatus(newLogEntry);
         setHeroEnergy(prev => Math.max(0, prev - 5));
+        payload = { location: currentLocation, energyUsed: 5 };
         break;
     }
     
     // Add to action log
     setActionLog(prev => [newLogEntry, ...prev]);
+    
+    // Log action to database
+    logGameAction(actionId, payload);
   };
   
   const handleLocationSelect = (location: LocationType) => {
@@ -119,12 +257,10 @@ export function useGameState() {
     const newLogEntry = `You moved to ${location.name} (${location.x},${location.y}). Used ${distance} stamina.`;
     setGameStatus(`You are now at ${location.name}.`);
     setActionLog(prev => [newLogEntry, ...prev]);
+    
+    // Log action to database
+    logGameAction('move', { from: currentLocation, to: location, energyUsed: distance });
   };
-  
-  // Effect to ensure we have a valid currentLocation on grid generation
-  useEffect(() => {
-    setCurrentLocation(cityGrid[3][3]);
-  }, [cityGrid]);
 
   return {
     cityGrid,
@@ -137,6 +273,7 @@ export function useGameState() {
     missionCount,
     gameActions,
     handleAction,
-    handleLocationSelect
+    handleLocationSelect,
+    loading
   };
 }
