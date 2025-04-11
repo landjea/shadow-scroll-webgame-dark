@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { RequireAuth } from "./components/RequireAuth";
 import Index from "./pages/Index";
 import Admin from "./pages/Admin";
+import CharacterStats from "./pages/CharacterStats";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -38,6 +39,11 @@ const App = () => {
               <Route path="/admin" element={
                 <RequireAuth adminOnly>
                   <Admin />
+                </RequireAuth>
+              } />
+              <Route path="/character-stats" element={
+                <RequireAuth adminOnly>
+                  <CharacterStats />
                 </RequireAuth>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

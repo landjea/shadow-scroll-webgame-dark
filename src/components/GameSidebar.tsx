@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { User, Shield, Zap, Award, Star, Flame, BookOpen, ChevronRight, Settings, Package, Map, LogOut } from "lucide-react";
@@ -9,18 +8,19 @@ import { Button } from '@/components/ui/button';
 
 interface GameSidebarProps {
   heroSpeed: number;
+  characterStats?: any;
 }
 
-const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed }) => {
+const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { signOut, isAdmin, user } = useAuth();
   
   const heroStats = [
-    { name: "Strength", value: 75 },
+    { name: "Strength", value: characterStats?.strength || 10 },
     { name: "Speed", value: heroSpeed * 20 }, // Convert speed to a 0-100 scale
-    { name: "Agility", value: 85 },
-    { name: "Intelligence", value: 70 },
+    { name: "Agility", value: characterStats?.charisma || 10 },
+    { name: "Intelligence", value: characterStats?.intelligence || 10 },
     { name: "Defense", value: 60 }
   ];
   
@@ -63,9 +63,9 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed }) => {
                 </div>
                 <div>
                   <h2 className="font-bold text-purple-300">
-                    {user?.email?.split('@')[0] || 'Hero'}
+                    {characterStats?.hero_name || user?.email?.split('@')[0] || 'Hero'}
                   </h2>
-                  <p className="text-xs text-purple-400">Level 5 Superhero</p>
+                  <p className="text-xs text-purple-400">Level {characterStats?.level || 1} Superhero</p>
                 </div>
               </div>
               <ChevronRight size={16} className="text-purple-400" />
@@ -79,9 +79,9 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed }) => {
                 </div>
                 <div>
                   <h2 className="font-bold text-lg text-purple-300">
-                    {user?.email?.split('@')[0] || 'Hero'}
+                    {characterStats?.hero_name || user?.email?.split('@')[0] || 'Hero'}
                   </h2>
-                  <p className="text-sm text-purple-400">Level 5 Superhero</p>
+                  <p className="text-sm text-purple-400">Level {characterStats?.level || 1} Superhero</p>
                 </div>
               </div>
             </div>

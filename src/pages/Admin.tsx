@@ -56,28 +56,16 @@ const AdminPage: React.FC = () => {
         // Get user details for each admin
         const adminIds = adminRoles.map(role => role.user_id);
         
-        // Instead of using admin.listUsers (which requires admin privileges),
-        // we'll use what's already in the database
+        // Use the get_user_email function instead of accessing auth.users directly
         const adminList: AdminUser[] = [];
         
         for (const id of adminIds) {
-          const { data: userProfile, error } = await supabase
-            .from('auth.users')
-            .select('email')
-            .eq('id', id)
-            .single();
+          const { data: email } = await supabase.rpc('get_user_email', { user_id: id });
             
-          if (!error && userProfile) {
-            adminList.push({
-              id,
-              email: userProfile.email || 'Unknown'
-            });
-          } else {
-            adminList.push({
-              id,
-              email: 'User ' + id.substring(0, 8)
-            });
-          }
+          adminList.push({
+            id,
+            email: email || 'User ' + id.substring(0, 8)
+          });
         }
         
         setAdminUsers(adminList);
@@ -100,14 +88,25 @@ const AdminPage: React.FC = () => {
     try {
       setLoading(true);
       
-      // First, find the user by email
-      const { data: users, error: userError } = await supabase.auth.admin.listUsers();
+      // First, find the user by email (database lookup)
+      // We need to use their id to assign admin role
+      const { data, error } = await supabase
+        .from('auth.users')
+        .select('id')
+        .eq('email', values.userEmail)
+        .maybeSingle();
       
-      if (userError) throw userError;
+      if (error) {
+        console.error('Error finding user:', error);
+        toast({
+          variant: 'destructive',
+          title: 'User not found',
+          description: 'No user with that email exists or could not be found'
+        });
+        return;
+      }
       
-      const user = users.users.find(u => u.email === values.userEmail);
-      
-      if (!user) {
+      if (!data) {
         toast({
           variant: 'destructive',
           title: 'User not found',
@@ -116,11 +115,13 @@ const AdminPage: React.FC = () => {
         return;
       }
       
+      const userId = data.id;
+      
       // Check if user is already an admin
       const { data: existingRole, error: checkError } = await supabase
         .from('user_roles')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .eq('role', 'admin')
         .maybeSingle();
       
@@ -138,7 +139,7 @@ const AdminPage: React.FC = () => {
       const { error: insertError } = await supabase
         .from('user_roles')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           role: 'admin'
         });
       
@@ -198,37 +199,43 @@ const AdminPage: React.FC = () => {
       title: "Character Management",
       description: "Create and manage superhero profiles and attributes",
       icon: <User className="h-6 w-6 text-purple-500" />,
-      color: "bg-purple-100"
+      color: "bg-purple-100",
+      path: "/character-stats"
     },
     {
       title: "Inventory Management",
       description: "Manage items, equipment and resources",
       icon: <Package className="h-6 w-6 text-blue-500" />,
-      color: "bg-blue-100"
+      color: "bg-blue-100",
+      path: "/"
     },
     {
       title: "Mission Management",
       description: "Create, assign and track superhero missions",
       icon: <Award className="h-6 w-6 text-yellow-500" />,
-      color: "bg-yellow-100"
+      color: "bg-yellow-100",
+      path: "/"
     },
     {
       title: "Ability Management",
       description: "Create and configure superhero abilities and powers",
       icon: <Zap className="h-6 w-6 text-green-500" />,
-      color: "bg-green-100"
+      color: "bg-green-100",
+      path: "/"
     },
     {
       title: "RBAC Management",
       description: "Manage roles, permissions and access control",
       icon: <Shield className="h-6 w-6 text-red-500" />,
-      color: "bg-red-100"
+      color: "bg-red-100",
+      path: "/"
     },
     {
       title: "Map Management",
       description: "Configure city map, locations and points of interest",
       icon: <Map className="h-6 w-6 text-indigo-500" />,
-      color: "bg-indigo-100"
+      color: "bg-indigo-100",
+      path: "/"
     }
   ];
 
@@ -318,7 +325,7 @@ const AdminPage: React.FC = () => {
             <CardFooter>
               <Button 
                 className="w-full bg-purple-600 hover:bg-purple-700" 
-                onClick={() => navigate('/')}
+                onClick={() => navigate(card.path)}
               >
                 Manage
               </Button>

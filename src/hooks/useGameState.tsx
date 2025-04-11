@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { LocationType } from '@/types/game';
 import { generateCityGrid } from '@/utils/mapUtils';
@@ -16,6 +17,20 @@ interface GameState {
   missionCount: number;
 }
 
+interface CharacterStats {
+  id: string;
+  hero_name: string;
+  energy: number;
+  health: number;
+  speed: number;
+  strength: number;
+  intelligence: number;
+  charisma: number;
+  missions_completed: number;
+  level: number;
+  experience: number;
+}
+
 export function useGameState() {
   const cityGrid = generateCityGrid(7);
   const [currentLocation, setCurrentLocation] = useState<LocationType>(cityGrid[3][3]);
@@ -28,6 +43,7 @@ export function useGameState() {
   const [heroSpeed, setHeroSpeed] = useState(2);
   const [missionCount, setMissionCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [characterStats, setCharacterStats] = useState<CharacterStats | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
   
@@ -64,19 +80,81 @@ export function useGameState() {
     }
   ];
 
+  // Load character stats from the database
   useEffect(() => {
     if (user) {
-      loadGameState();
+      loadCharacterStats();
     } else {
       setLoading(false);
     }
   }, [user]);
 
+  // Update character stats in the database when they change
   useEffect(() => {
-    if (user && !loading) {
-      saveGameState();
+    if (user && characterStats && !loading) {
+      updateCharacterStats();
     }
-  }, [currentLocation, heroEnergy, heroHealth, heroSpeed, missionCount, user, loading]);
+  }, [heroEnergy, heroHealth, heroSpeed, missionCount, user, loading, characterStats]);
+
+  // Load game state after character stats are loaded
+  useEffect(() => {
+    if (characterStats && user) {
+      loadGameState();
+    }
+  }, [characterStats, user]);
+
+  const loadCharacterStats = async () => {
+    try {
+      if (!user) return;
+      
+      setLoading(true);
+      
+      const { data, error } = await supabase
+        .from('character_stats')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (error) {
+        // If character stats don't exist yet, they will be created by the DB trigger
+        console.error('Error loading character stats:', error);
+        return;
+      }
+      
+      if (data) {
+        setCharacterStats(data);
+        setHeroEnergy(data.energy);
+        setHeroHealth(data.health);
+        setHeroSpeed(data.speed);
+        setMissionCount(data.missions_completed);
+      }
+    } catch (error) {
+      console.error('Error loading character stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateCharacterStats = async () => {
+    try {
+      if (!user || !characterStats) return;
+      
+      const { error } = await supabase
+        .from('character_stats')
+        .update({
+          energy: heroEnergy,
+          health: heroHealth,
+          speed: heroSpeed,
+          missions_completed: missionCount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', characterStats.id);
+      
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating character stats:', error);
+    }
+  };
 
   const loadGameState = async () => {
     try {
@@ -94,15 +172,18 @@ export function useGameState() {
       
       if (data) {
         const gameState = data.game_state as any;
-        const playerData = data.player_data as any;
         
-        setCurrentLocation(gameState.currentLocation || cityGrid[3][3]);
+        // Find the location in the grid that matches the saved location
+        const savedLocation = gameState.currentLocation;
+        if (savedLocation) {
+          const matchingLocation = cityGrid[savedLocation.x]?.[savedLocation.y];
+          if (matchingLocation) {
+            setCurrentLocation(matchingLocation);
+          }
+        }
+        
         setGameStatus(gameState.gameStatus || "Ready for action! The city needs your help.");
         setActionLog(gameState.actionLog || ["You've started your hero journey in the city center."]);
-        setHeroEnergy(playerData.energy || 100);
-        setHeroHealth(playerData.health || 100);
-        setHeroSpeed(playerData.speed || 2);
-        setMissionCount(playerData.missionCount || 0);
         
         toast({
           title: "Game loaded!",
@@ -130,8 +211,7 @@ export function useGameState() {
         name: currentLocation.name,
         type: currentLocation.type,
         x: currentLocation.x,
-        y: currentLocation.y,
-        description: currentLocation.description
+        y: currentLocation.y
       };
       
       const gameState = {
@@ -140,19 +220,17 @@ export function useGameState() {
         actionLog
       };
       
-      const playerData = {
-        energy: heroEnergy,
-        health: heroHealth,
-        speed: heroSpeed,
-        missionCount
-      };
-      
       const { error } = await supabase
         .from('game_saves')
         .upsert({
           user_id: user.id,
           game_state: gameState,
-          player_data: playerData,
+          player_data: {
+            energy: heroEnergy,
+            health: heroHealth,
+            speed: heroSpeed,
+            missionCount
+          },
           last_updated: new Date().toISOString()
         });
       
@@ -274,6 +352,7 @@ export function useGameState() {
     gameActions,
     handleAction,
     handleLocationSelect,
-    loading
+    loading,
+    characterStats
   };
 }

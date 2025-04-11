@@ -9,6 +9,57 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      character_stats: {
+        Row: {
+          charisma: number
+          created_at: string
+          energy: number
+          experience: number
+          health: number
+          hero_name: string
+          id: string
+          intelligence: number
+          level: number
+          missions_completed: number
+          speed: number
+          strength: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          charisma?: number
+          created_at?: string
+          energy?: number
+          experience?: number
+          health?: number
+          hero_name?: string
+          id?: string
+          intelligence?: number
+          level?: number
+          missions_completed?: number
+          speed?: number
+          strength?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          charisma?: number
+          created_at?: string
+          energy?: number
+          experience?: number
+          health?: number
+          hero_name?: string
+          id?: string
+          intelligence?: number
+          level?: number
+          missions_completed?: number
+          speed?: number
+          strength?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       game_actions: {
         Row: {
           action_type: string
@@ -86,6 +137,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_email: {
+        Args: { user_id: string }
+        Returns: string
+      }
       has_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: boolean
