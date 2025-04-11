@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -87,16 +88,12 @@ const AdminPage: React.FC = () => {
     try {
       setLoading(true);
       
-      // First, find the user by email (database lookup)
-      // We need to use their id to assign admin role
-      const { data, error } = await supabase
-        .from('auth.users')
-        .select('id')
-        .eq('email', values.userEmail)
-        .maybeSingle();
+      // First, we need to find the user by email
+      // This needs a custom RPC call since we can't directly query auth.users
+      const { data: userData, error: userError } = await supabase
+        .rpc('get_user_id_by_email', { email: values.userEmail });
       
-      if (error) {
-        console.error('Error finding user:', error);
+      if (userError || !userData) {
         toast({
           variant: 'destructive',
           title: 'User not found',
@@ -105,16 +102,7 @@ const AdminPage: React.FC = () => {
         return;
       }
       
-      if (!data) {
-        toast({
-          variant: 'destructive',
-          title: 'User not found',
-          description: 'No user with that email exists'
-        });
-        return;
-      }
-      
-      const userId = data.id;
+      const userId = userData;
       
       // Check if user is already an admin
       const { data: existingRole, error: checkError } = await supabase
@@ -206,35 +194,35 @@ const AdminPage: React.FC = () => {
       description: "Manage items, equipment and resources",
       icon: <Package className="h-6 w-6 text-blue-500" />,
       color: "bg-blue-100",
-      path: "/"
+      path: "/admin/inventory"
     },
     {
       title: "Mission Management",
       description: "Create, assign and track superhero missions",
       icon: <Award className="h-6 w-6 text-yellow-500" />,
       color: "bg-yellow-100",
-      path: "/"
+      path: "/admin/missions"
     },
     {
       title: "Ability Management",
       description: "Create and configure superhero abilities and powers",
       icon: <Zap className="h-6 w-6 text-green-500" />,
       color: "bg-green-100",
-      path: "/"
+      path: "/admin/abilities"
     },
     {
       title: "RBAC Management",
       description: "Manage roles, permissions and access control",
       icon: <Shield className="h-6 w-6 text-red-500" />,
       color: "bg-red-100",
-      path: "/"
+      path: "/admin/roles"
     },
     {
       title: "Map Management",
       description: "Configure city map, locations and points of interest",
       icon: <Map className="h-6 w-6 text-indigo-500" />,
       color: "bg-indigo-100",
-      path: "/"
+      path: "/admin/map"
     }
   ];
 

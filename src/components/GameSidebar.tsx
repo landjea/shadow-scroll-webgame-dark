@@ -1,6 +1,10 @@
+
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { User, Shield, Zap, Award, Star, Flame, BookOpen, ChevronRight, Settings, Package, Map, LogOut } from "lucide-react";
+import { 
+  User, Shield, Zap, Award, Star, Flame, BookOpen, 
+  ChevronRight, Settings, Package, Map, LogOut 
+} from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -32,12 +36,41 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) 
   ];
   
   const adminOptions = [
-    { name: "Character Management", icon: <User size={16} className="text-purple-300" /> },
-    { name: "Inventory Management", icon: <Package size={16} className="text-blue-400" /> },
-    { name: "Mission Management", icon: <Award size={16} className="text-yellow-400" /> },
-    { name: "Ability Management", icon: <Zap size={16} className="text-green-400" /> },
-    { name: "RBAC Management", icon: <Shield size={16} className="text-red-400" /> },
-    { name: "Map Management", icon: <Map size={16} className="text-indigo-400" /> }
+    { 
+      name: "Admin Dashboard", 
+      icon: <Settings size={16} className="text-white" />,
+      path: "/admin"
+    },
+    { 
+      name: "Character Management", 
+      icon: <User size={16} className="text-purple-300" />,
+      path: "/character-stats"
+    },
+    { 
+      name: "Inventory Management", 
+      icon: <Package size={16} className="text-blue-400" />,
+      path: "/admin/inventory"
+    },
+    { 
+      name: "Mission Management", 
+      icon: <Award size={16} className="text-yellow-400" />,
+      path: "/admin/missions"
+    },
+    { 
+      name: "Ability Management", 
+      icon: <Zap size={16} className="text-green-400" />,
+      path: "/admin/abilities"
+    },
+    { 
+      name: "RBAC Management", 
+      icon: <Shield size={16} className="text-red-400" />,
+      path: "/admin/roles"
+    },
+    { 
+      name: "Map Management", 
+      icon: <Map size={16} className="text-indigo-400" />,
+      path: "/admin/map"
+    }
   ];
   
   const navigationTabs = [
@@ -49,6 +82,14 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) 
 
   const handleNavigation = (path: string) => {
     navigate(path);
+  };
+
+  // Function to check if a path is active or is a parent of the current path
+  const isActivePath = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
   };
 
   return (
@@ -129,7 +170,9 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) 
           {navigationTabs.map((tab) => (
             <li key={tab.name}>
               <button 
-                className="w-full text-left px-3 py-2 rounded flex items-center space-x-3 hover:bg-purple-900 hover:text-purple-200 transition-colors text-purple-400"
+                className={`w-full text-left px-3 py-2 rounded flex items-center space-x-3 hover:bg-purple-900 hover:text-purple-200 transition-colors ${
+                  isActivePath(tab.path) ? "bg-purple-900 text-purple-200" : "text-purple-400"
+                }`}
                 onClick={() => handleNavigation(tab.path)}
               >
                 <span>{tab.icon}</span>
@@ -138,14 +181,18 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) 
             </li>
           ))}
           
-          {/* Admin Popover - Only show if user is admin */}
+          {/* Admin Flyout Menu - Only show if user is admin */}
           {isAdmin && (
             <li>
               <Popover>
                 <PopoverTrigger asChild>
-                  <button className={`w-full text-left px-3 py-2 rounded flex items-center justify-between hover:bg-purple-900 hover:text-purple-200 transition-colors ${location.pathname === '/admin' ? "bg-purple-900 text-purple-200" : "text-purple-400"}`}>
+                  <button 
+                    className={`w-full text-left px-3 py-2 rounded flex items-center justify-between hover:bg-purple-900 hover:text-purple-200 transition-colors ${
+                      location.pathname.includes('/admin') ? "bg-purple-900 text-purple-200" : "text-purple-400"
+                    }`}
+                  >
                     <div className="flex items-center space-x-3">
-                      <span><Settings size={18} /></span>
+                      <span><Shield size={18} /></span>
                       <span className="font-mono text-sm">Admin</span>
                     </div>
                     <ChevronRight size={16} className="text-purple-400" />
@@ -159,8 +206,10 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) 
                     {adminOptions.map((option) => (
                       <button 
                         key={option.name}
-                        className="w-full text-left px-3 py-2 rounded flex items-center space-x-3 hover:bg-purple-800 text-purple-300 transition-colors"
-                        onClick={() => handleNavigation('/admin')}
+                        className={`w-full text-left px-3 py-2 rounded flex items-center space-x-3 hover:bg-purple-800 transition-colors ${
+                          isActivePath(option.path) ? "bg-purple-800 text-purple-200" : "text-purple-300"
+                        }`}
+                        onClick={() => handleNavigation(option.path)}
                       >
                         <span>{option.icon}</span>
                         <span className="text-sm">{option.name}</span>
