@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Map, Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -26,16 +25,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-
-interface Location {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  x_coord: number;
-  y_coord: number;
-  is_unlocked: boolean;
-}
+import { Location } from '@/types/admin';
 
 const LocationsAdmin: React.FC = () => {
   const { toast } = useToast();

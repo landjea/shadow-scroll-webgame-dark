@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { BookOpen, Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -27,15 +26,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { Textarea } from '@/components/ui/textarea';
-
-interface Story {
-  id: string;
-  title: string;
-  content: string;
-  sequence: number;
-  is_published: boolean;
-  requirements: string | null;
-}
+import { Story } from '@/types/admin';
 
 const StoriesAdmin: React.FC = () => {
   const { toast } = useToast();

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Package, Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -26,15 +25,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-
-interface InventoryItem {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  rarity: string;
-  quantity: number;
-}
+import { InventoryItem } from '@/types/admin';
 
 const InventoryAdmin: React.FC = () => {
   const { toast } = useToast();

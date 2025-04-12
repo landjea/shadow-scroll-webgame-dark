@@ -60,6 +60,39 @@ export type Database = {
         }
         Relationships: []
       }
+      characters: {
+        Row: {
+          abilities: string[] | null
+          backstory: string | null
+          created_at: string
+          id: string
+          is_playable: boolean
+          name: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          abilities?: string[] | null
+          backstory?: string | null
+          created_at?: string
+          id?: string
+          is_playable?: boolean
+          name: string
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          abilities?: string[] | null
+          backstory?: string | null
+          created_at?: string
+          id?: string
+          is_playable?: boolean
+          name?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       game_actions: {
         Row: {
           action_type: string
@@ -111,6 +144,144 @@ export type Database = {
           last_updated?: string
           player_data?: Json
           user_id?: string
+        }
+        Relationships: []
+      }
+      inventory_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          quantity: number
+          rarity: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          quantity?: number
+          rarity?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          quantity?: number
+          rarity?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      map_locations: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_unlocked: boolean
+          name: string
+          type: string
+          updated_at: string
+          x_coord: number
+          y_coord: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_unlocked?: boolean
+          name: string
+          type: string
+          updated_at?: string
+          x_coord?: number
+          y_coord?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_unlocked?: boolean
+          name?: string
+          type?: string
+          updated_at?: string
+          x_coord?: number
+          y_coord?: number
+        }
+        Relationships: []
+      }
+      missions: {
+        Row: {
+          created_at: string
+          description: string
+          difficulty: string
+          id: string
+          is_active: boolean
+          location_id: string | null
+          rewards: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          difficulty?: string
+          id?: string
+          is_active?: boolean
+          location_id?: string | null
+          rewards: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          difficulty?: string
+          id?: string
+          is_active?: boolean
+          location_id?: string | null
+          rewards?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      stories: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_published: boolean
+          requirements: string | null
+          sequence: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          requirements?: string | null
+          sequence?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          requirements?: string | null
+          sequence?: number
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }

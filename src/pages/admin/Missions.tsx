@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Award, Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -27,16 +26,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { Textarea } from '@/components/ui/textarea';
-
-interface Mission {
-  id: string;
-  title: string;
-  description: string;
-  difficulty: string;
-  rewards: string;
-  location_id: string | null;
-  is_active: boolean;
-}
+import { Mission } from '@/types/admin';
 
 const MissionsAdmin: React.FC = () => {
   const { toast } = useToast();

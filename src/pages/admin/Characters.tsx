@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { User, Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -26,15 +25,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-
-interface Character {
-  id: string;
-  name: string;
-  role: string;
-  backstory: string;
-  abilities: string[];
-  is_playable: boolean;
-}
+import { Character } from '@/types/admin';
 
 const CharactersAdmin: React.FC = () => {
   const { toast } = useToast();
