@@ -26,11 +26,13 @@ export const getUserEmail = async (userId: string): Promise<string> => {
 export const getUserIdByEmail = async (email: string): Promise<string | null> => {
   try {
     // Fallback to querying the custom function
-    const { data, error } = await supabase.rpc('get_user_id_by_email', { email });
+    const { data, error } = await supabase.rpc('get_user_id_by_email', { 
+      email: email 
+    });
     
     if (error) throw error;
     
-    return data;
+    return data as string;
   } catch (error) {
     console.error('Error getting user ID by email:', error);
     return null;

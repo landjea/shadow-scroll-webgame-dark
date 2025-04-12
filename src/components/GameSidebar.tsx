@@ -92,6 +92,9 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) 
     return location.pathname.startsWith(path);
   };
 
+  console.log("isAdmin value:", isAdmin);
+  console.log("Current location:", location.pathname);
+
   return (
     <div className="h-full w-full bg-purple-950 border-r border-purple-900/80 flex flex-col">
       {/* User Profile Section */}
