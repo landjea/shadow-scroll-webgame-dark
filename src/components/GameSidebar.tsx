@@ -44,7 +44,7 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) 
     { 
       name: "Character Management", 
       icon: <User size={16} className="text-purple-300" />,
-      path: "/character-stats"
+      path: "/admin/characters"
     },
     { 
       name: "Inventory Management", 
@@ -57,18 +57,23 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) 
       path: "/admin/missions"
     },
     { 
+      name: "Story Management", 
+      icon: <BookOpen size={16} className="text-green-400" />,
+      path: "/admin/stories"
+    },
+    { 
       name: "Ability Management", 
-      icon: <Zap size={16} className="text-green-400" />,
+      icon: <Zap size={16} className="text-red-400" />,
       path: "/admin/abilities"
     },
     { 
       name: "RBAC Management", 
-      icon: <Shield size={16} className="text-red-400" />,
+      icon: <Shield size={16} className="text-indigo-400" />,
       path: "/admin/roles"
     },
     { 
       name: "Map Management", 
-      icon: <Map size={16} className="text-indigo-400" />,
+      icon: <Map size={16} className="text-teal-400" />,
       path: "/admin/map"
     }
   ];

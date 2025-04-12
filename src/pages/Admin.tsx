@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Package, Award, Zap, Shield, Map, Loader2 } from "lucide-react";
+import { User, Package, Award, Zap, Shield, Map, Loader2, BookOpen } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -53,10 +53,8 @@ const AdminPage: React.FC = () => {
       if (rolesError) throw rolesError;
       
       if (adminRoles && adminRoles.length > 0) {
-        // Get user details for each admin
         const adminIds = adminRoles.map(role => role.user_id);
         
-        // Use the get_user_email function instead of accessing auth.users directly
         const adminList: AdminUser[] = [];
         
         for (const id of adminIds) {
@@ -88,7 +86,6 @@ const AdminPage: React.FC = () => {
     try {
       setLoading(true);
       
-      // First, we need to find the user by email using our custom function
       const userId = await getUserIdByEmail(values.userEmail);
       
       if (!userId) {
@@ -100,7 +97,6 @@ const AdminPage: React.FC = () => {
         return;
       }
       
-      // Check if user is already an admin
       const { data: existingRole, error: checkError } = await supabase
         .from('user_roles')
         .select('*')
@@ -118,7 +114,6 @@ const AdminPage: React.FC = () => {
         return;
       }
       
-      // Add admin role
       const { error: insertError } = await supabase
         .from('user_roles')
         .insert({
@@ -183,7 +178,7 @@ const AdminPage: React.FC = () => {
       description: "Create and manage superhero profiles and attributes",
       icon: <User className="h-6 w-6 text-purple-500" />,
       color: "bg-purple-100",
-      path: "/character-stats"
+      path: "/admin/characters"
     },
     {
       title: "Inventory Management",
@@ -200,24 +195,31 @@ const AdminPage: React.FC = () => {
       path: "/admin/missions"
     },
     {
+      title: "Story Management",
+      description: "Create and manage game storylines and chapters",
+      icon: <BookOpen className="h-6 w-6 text-green-500" />,
+      color: "bg-green-100",
+      path: "/admin/stories"
+    },
+    {
       title: "Ability Management",
       description: "Create and configure superhero abilities and powers",
-      icon: <Zap className="h-6 w-6 text-green-500" />,
-      color: "bg-green-100",
+      icon: <Zap className="h-6 w-6 text-red-500" />,
+      color: "bg-red-100",
       path: "/admin/abilities"
     },
     {
       title: "RBAC Management",
       description: "Manage roles, permissions and access control",
-      icon: <Shield className="h-6 w-6 text-red-500" />,
-      color: "bg-red-100",
+      icon: <Shield className="h-6 w-6 text-indigo-500" />,
+      color: "bg-indigo-100",
       path: "/admin/roles"
     },
     {
       title: "Map Management",
       description: "Configure city map, locations and points of interest",
-      icon: <Map className="h-6 w-6 text-indigo-500" />,
-      color: "bg-indigo-100",
+      icon: <Map className="h-6 w-6 text-teal-500" />,
+      color: "bg-teal-100",
       path: "/admin/map"
     }
   ];
@@ -229,7 +231,6 @@ const AdminPage: React.FC = () => {
         <p className="text-gray-600">Manage your superhero game settings and configurations</p>
       </header>
       
-      {/* Admin Role Management */}
       <Card className="mb-8 border-t-4 border-purple-500">
         <CardHeader>
           <CardTitle>Admin Role Management</CardTitle>
