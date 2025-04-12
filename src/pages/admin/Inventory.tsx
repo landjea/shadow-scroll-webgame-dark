@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Package } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -20,7 +19,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useAuth } from '@/contexts/AuthContext';
 import { InventoryItem } from '@/types/admin';
 import AdminHeader from '@/components/admin/AdminHeader';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
@@ -29,10 +27,10 @@ import FormField from '@/components/admin/FormField';
 import AdminDialogFooter from '@/components/admin/DialogFooter';
 import LoadingState from '@/components/admin/LoadingState';
 import { useAdminTable } from '@/hooks/useAdminTable';
+import AdminLayout from '@/components/admin/AdminLayout';
 
 const InventoryAdmin: React.FC = () => {
   const { toast } = useToast();
-  const { isAdmin } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -152,17 +150,8 @@ const InventoryAdmin: React.FC = () => {
     resetForm();
   };
 
-  if (!isAdmin) {
-    return (
-      <div className="container mx-auto p-6 text-center">
-        <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
-        <p>You don't have permission to access this page.</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto p-6">
+    <AdminLayout>
       <AdminHeader 
         title="Inventory Management"
         description="Manage game items, equipment and resources"
@@ -281,7 +270,7 @@ const InventoryAdmin: React.FC = () => {
           </TableBody>
         </Table>
       )}
-    </div>
+    </AdminLayout>
   );
 };
 

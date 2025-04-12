@@ -18,7 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useAuth } from '@/contexts/AuthContext';
 import { Character } from '@/types/admin';
 import AdminHeader from '@/components/admin/AdminHeader';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
@@ -31,6 +30,7 @@ import AdminDialogFooter from '@/components/admin/DialogFooter';
 import LoadingState from '@/components/admin/LoadingState';
 import { useAdminTable } from '@/hooks/useAdminTable';
 import { useAdminForm } from '@/hooks/useAdminForm';
+import AdminLayout from '@/components/admin/AdminLayout';
 
 interface CharacterFormData {
   name: string;
@@ -41,8 +41,6 @@ interface CharacterFormData {
 }
 
 const CharactersAdmin: React.FC = () => {
-  const { isAdmin } = useAuth();
-  
   const {
     items: characters,
     isLoading,
@@ -140,17 +138,8 @@ const CharactersAdmin: React.FC = () => {
     resetForm();
   };
 
-  if (!isAdmin) {
-    return (
-      <div className="container mx-auto p-6 text-center">
-        <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
-        <p>You don't have permission to access this page.</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto p-6">
+    <AdminLayout>
       <AdminHeader 
         title="Character Management"
         description="Create and manage superhero characters"
@@ -270,7 +259,7 @@ const CharactersAdmin: React.FC = () => {
           </TableBody>
         </Table>
       )}
-    </div>
+    </AdminLayout>
   );
 };
 
