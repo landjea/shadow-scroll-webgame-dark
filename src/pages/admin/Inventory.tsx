@@ -1,10 +1,9 @@
+
 import React, { useState } from 'react';
-import { Package, Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { Package } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -18,20 +17,23 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { InventoryItem } from '@/types/admin';
+import AdminHeader from '@/components/admin/AdminHeader';
+import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import AdminItemActions from '@/components/admin/AdminItemActions';
+import FormField from '@/components/admin/FormField';
+import AdminDialogFooter from '@/components/admin/DialogFooter';
+import LoadingState from '@/components/admin/LoadingState';
+import { useAdminTable } from '@/hooks/useAdminTable';
 
 const InventoryAdmin: React.FC = () => {
   const { toast } = useToast();
   const { isAdmin } = useAuth();
-  const [open, setOpen] = useState(false);
-  const [editItem, setEditItem] = useState<InventoryItem | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -40,17 +42,21 @@ const InventoryAdmin: React.FC = () => {
     quantity: 1
   });
 
-  const { data: inventoryItems, isLoading, refetch } = useQuery({
-    queryKey: ['inventory-items'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('inventory_items')
-        .select('*')
-        .order('name');
-        
-      if (error) throw error;
-      return data as InventoryItem[];
-    }
+  const {
+    items: inventoryItems,
+    isLoading,
+    refetch,
+    dialogOpen, 
+    setDialogOpen,
+    editItem,
+    handleDelete,
+    openAddDialog,
+    openEditDialog,
+    closeDialog
+  } = useAdminTable<InventoryItem>({
+    tableName: 'inventory_items',
+    queryKey: 'inventory-items',
+    orderByField: 'name'
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,23 +75,22 @@ const InventoryAdmin: React.FC = () => {
       rarity: 'common',
       quantity: 1
     });
-    setEditItem(null);
   };
 
-  const openEditDialog = (item: InventoryItem) => {
-    setEditItem(item);
+  const handleOpenEditDialog = (item: InventoryItem) => {
     setFormData({
       name: item.name,
-      description: item.description,
+      description: item.description || '',
       type: item.type,
       rarity: item.rarity,
       quantity: item.quantity
     });
-    setOpen(true);
+    openEditDialog(item);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
     
     try {
       if (editItem) {
@@ -127,7 +132,7 @@ const InventoryAdmin: React.FC = () => {
         });
       }
       
-      setOpen(false);
+      setDialogOpen(false);
       resetForm();
       refetch();
     } catch (error) {
@@ -137,34 +142,14 @@ const InventoryAdmin: React.FC = () => {
         title: 'Error',
         description: 'Failed to save inventory item.'
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
-    
-    try {
-      const { error } = await supabase
-        .from('inventory_items')
-        .delete()
-        .eq('id', id);
-        
-      if (error) throw error;
-      
-      toast({
-        title: 'Item deleted',
-        description: `${name} has been removed from inventory.`
-      });
-      
-      refetch();
-    } catch (error) {
-      console.error('Error deleting inventory item:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to delete inventory item.'
-      });
-    }
+  const handleCancel = () => {
+    closeDialog();
+    resetForm();
   };
 
   if (!isAdmin) {
@@ -178,119 +163,85 @@ const InventoryAdmin: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <header className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-purple-800">Inventory Management</h1>
-          <p className="text-gray-600">Manage game items, equipment and resources</p>
-        </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-purple-600 hover:bg-purple-700">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Item
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{editItem ? 'Edit Item' : 'Add New Item'}</DialogTitle>
-              <DialogDescription>
-                {editItem 
-                  ? `Make changes to ${editItem.name}.` 
-                  : 'Fill out the form below to add a new inventory item.'}
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit}>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">Name</Label>
-                  <Input 
-                    id="name" 
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="col-span-3" 
-                    required
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="description" className="text-right">Description</Label>
-                  <Input 
-                    id="description" 
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    className="col-span-3" 
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="type" className="text-right">Type</Label>
-                  <Input 
-                    id="type" 
-                    name="type"
-                    value={formData.type}
-                    onChange={handleInputChange}
-                    className="col-span-3" 
-                    required
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="rarity" className="text-right">Rarity</Label>
-                  <Input 
-                    id="rarity" 
-                    name="rarity"
-                    value={formData.rarity}
-                    onChange={handleInputChange}
-                    className="col-span-3" 
-                    required
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="quantity" className="text-right">Quantity</Label>
-                  <Input 
-                    id="quantity" 
-                    name="quantity"
-                    type="number"
-                    min={0}
-                    value={formData.quantity}
-                    onChange={handleInputChange}
-                    className="col-span-3" 
-                    required
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => {
-                  setOpen(false);
-                  resetForm();
-                }}>
-                  Cancel
-                </Button>
-                <Button type="submit" className="bg-purple-600 hover:bg-purple-700">
-                  {editItem ? 'Save Changes' : 'Add Item'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </header>
+      <AdminHeader 
+        title="Inventory Management"
+        description="Manage game items, equipment and resources"
+        onAddNew={openAddDialog}
+        addButtonText="Add Item"
+      />
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editItem ? 'Edit Item' : 'Add New Item'}</DialogTitle>
+            <DialogDescription>
+              {editItem 
+                ? `Make changes to ${editItem.name}.` 
+                : 'Fill out the form below to add a new inventory item.'}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-4 py-4">
+              <FormField 
+                id="name" 
+                label="Name" 
+                value={formData.name} 
+                onChange={handleInputChange} 
+                required 
+              />
+              
+              <FormField 
+                id="description" 
+                label="Description" 
+                value={formData.description} 
+                onChange={handleInputChange} 
+              />
+              
+              <FormField 
+                id="type" 
+                label="Type" 
+                value={formData.type} 
+                onChange={handleInputChange} 
+                required 
+              />
+              
+              <FormField 
+                id="rarity" 
+                label="Rarity" 
+                value={formData.rarity} 
+                onChange={handleInputChange} 
+                required 
+              />
+              
+              <FormField 
+                id="quantity" 
+                label="Quantity" 
+                type="number"
+                value={formData.quantity} 
+                onChange={handleInputChange} 
+                required 
+                min={0}
+              />
+            </div>
+            <AdminDialogFooter 
+              onCancel={handleCancel}
+              isEditing={!!editItem}
+              isSubmitting={submitting}
+            />
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {isLoading ? (
-        <div className="flex justify-center my-12">
-          <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-        </div>
+        <LoadingState />
       ) : inventoryItems?.length === 0 ? (
-        <div className="text-center my-12 p-8 border border-dashed rounded-lg">
-          <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium mb-2">No items found</h3>
-          <p className="text-gray-600 mb-4">Start by adding some items to your inventory.</p>
-          <Button 
-            onClick={() => setOpen(true)}
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add First Item
-          </Button>
-        </div>
+        <AdminEmptyState 
+          icon={Package}
+          title="No items found"
+          description="Start by adding some items to your inventory."
+          onAddNew={openAddDialog}
+          addButtonText="Add First Item"
+        />
       ) : (
         <Table>
           <TableCaption>A list of all inventory items in the game.</TableCaption>
@@ -320,20 +271,10 @@ const InventoryAdmin: React.FC = () => {
                 </TableCell>
                 <TableCell>{item.quantity}</TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => openEditDialog(item)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(item.id, item.name)}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
+                  <AdminItemActions
+                    onEdit={() => handleOpenEditDialog(item)}
+                    onDelete={() => handleDelete(item.id, item.name)}
+                  />
                 </TableCell>
               </TableRow>
             ))}

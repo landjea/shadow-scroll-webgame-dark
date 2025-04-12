@@ -1,10 +1,7 @@
-import React, { useState } from 'react';
-import { User, Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+
+import React from 'react';
+import { User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -18,158 +15,129 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { Character } from '@/types/admin';
+import AdminHeader from '@/components/admin/AdminHeader';
+import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import AdminItemActions from '@/components/admin/AdminItemActions';
+import AdminStatus from '@/components/admin/AdminStatus';
+import AdminTag from '@/components/admin/AdminTag';
+import FormField from '@/components/admin/FormField';
+import CheckboxField from '@/components/admin/CheckboxField';
+import AdminDialogFooter from '@/components/admin/DialogFooter';
+import LoadingState from '@/components/admin/LoadingState';
+import { useAdminTable } from '@/hooks/useAdminTable';
+import { useAdminForm } from '@/hooks/useAdminForm';
+
+interface CharacterFormData {
+  name: string;
+  role: string;
+  backstory: string;
+  abilities: string;
+  is_playable: boolean;
+}
 
 const CharactersAdmin: React.FC = () => {
-  const { toast } = useToast();
   const { isAdmin } = useAuth();
-  const [open, setOpen] = useState(false);
-  const [editCharacter, setEditCharacter] = useState<Character | null>(null);
-  const [formData, setFormData] = useState({
+  
+  const {
+    items: characters,
+    isLoading,
+    refetch,
+    dialogOpen, 
+    setDialogOpen,
+    editItem,
+    handleDelete,
+    openAddDialog,
+    openEditDialog,
+    closeDialog
+  } = useAdminTable<Character>({
+    tableName: 'characters',
+    queryKey: 'characters',
+    orderByField: 'name'
+  });
+
+  const initialFormState: CharacterFormData = {
     name: '',
     role: '',
     backstory: '',
     abilities: '',
     is_playable: false
+  };
+
+  const itemToFormData = (character: Character): CharacterFormData => ({
+    name: character.name,
+    role: character.role,
+    backstory: character.backstory || '',
+    abilities: character.abilities.join(', '),
+    is_playable: character.is_playable
   });
 
-  const { data: characters, isLoading, refetch } = useQuery({
-    queryKey: ['characters'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('characters')
-        .select('*')
-        .order('name');
-        
-      if (error) throw error;
-      return data as Character[];
+  const {
+    formData,
+    handleInputChange,
+    resetForm,
+    setFormForEditing,
+    handleSubmit,
+    submitting
+  } = useAdminForm<Character, CharacterFormData>({
+    tableName: 'characters',
+    initialFormState,
+    itemToFormData,
+    onSuccess: () => {
+      setDialogOpen(false);
+      refetch();
     }
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
+  const handleOpenEditDialog = (character: Character) => {
+    setFormForEditing(character);
+    openEditDialog(character);
   };
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      role: '',
-      backstory: '',
-      abilities: '',
-      is_playable: false
-    });
-    setEditCharacter(null);
-  };
-
-  const openEditDialog = (character: Character) => {
-    setEditCharacter(character);
-    setFormData({
-      name: character.name,
-      role: character.role,
-      backstory: character.backstory,
-      abilities: character.abilities.join(', '),
-      is_playable: character.is_playable
-    });
-    setOpen(true);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Convert comma-separated abilities to array
+    const abilities = formData.abilities
+      .split(',')
+      .map(ability => ability.trim())
+      .filter(ability => ability);
+      
+    const dataToSubmit = {
+      ...formData,
+      abilities
+    };
     
     try {
-      const abilities = formData.abilities
-        .split(',')
-        .map(ability => ability.trim())
-        .filter(ability => ability);
-        
-      if (editCharacter) {
-        // Update existing character
+      if (editItem) {
         const { error } = await supabase
           .from('characters')
-          .update({
-            name: formData.name,
-            role: formData.role,
-            backstory: formData.backstory,
-            abilities: abilities,
-            is_playable: formData.is_playable
-          })
-          .eq('id', editCharacter.id);
+          .update(dataToSubmit)
+          .eq('id', editItem.id);
           
         if (error) throw error;
-        
-        toast({
-          title: 'Character updated',
-          description: `${formData.name} has been updated.`
-        });
       } else {
-        // Create new character
         const { error } = await supabase
           .from('characters')
-          .insert({
-            name: formData.name,
-            role: formData.role,
-            backstory: formData.backstory,
-            abilities: abilities,
-            is_playable: formData.is_playable
-          });
+          .insert(dataToSubmit);
           
         if (error) throw error;
-        
-        toast({
-          title: 'Character created',
-          description: `${formData.name} has been added to the game.`
-        });
       }
       
-      setOpen(false);
+      setDialogOpen(false);
       resetForm();
       refetch();
     } catch (error) {
-      console.error('Error saving character:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to save character.'
-      });
+      console.error('Error:', error);
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
-    
-    try {
-      const { error } = await supabase
-        .from('characters')
-        .delete()
-        .eq('id', id);
-        
-      if (error) throw error;
-      
-      toast({
-        title: 'Character deleted',
-        description: `${name} has been removed from the game.`
-      });
-      
-      refetch();
-    } catch (error) {
-      console.error('Error deleting character:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to delete character.'
-      });
-    }
+  const handleCancel = () => {
+    closeDialog();
+    resetForm();
   };
 
   if (!isAdmin) {
@@ -183,122 +151,83 @@ const CharactersAdmin: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <header className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-purple-800">Character Management</h1>
-          <p className="text-gray-600">Create and manage superhero characters</p>
-        </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-purple-600 hover:bg-purple-700">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Character
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{editCharacter ? 'Edit Character' : 'Add New Character'}</DialogTitle>
-              <DialogDescription>
-                {editCharacter 
-                  ? `Make changes to ${editCharacter.name}.` 
-                  : 'Fill out the form below to create a new character.'}
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit}>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">Name</Label>
-                  <Input 
-                    id="name" 
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="col-span-3" 
-                    required
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="role" className="text-right">Role</Label>
-                  <Input 
-                    id="role" 
-                    name="role"
-                    value={formData.role}
-                    onChange={handleInputChange}
-                    className="col-span-3" 
-                    required
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="backstory" className="text-right">Backstory</Label>
-                  <Input 
-                    id="backstory" 
-                    name="backstory"
-                    value={formData.backstory}
-                    onChange={handleInputChange}
-                    className="col-span-3" 
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="abilities" className="text-right">Abilities</Label>
-                  <Input 
-                    id="abilities" 
-                    name="abilities"
-                    value={formData.abilities}
-                    onChange={handleInputChange}
-                    className="col-span-3" 
-                    placeholder="Super strength, Flight, etc. (comma separated)"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="is_playable" className="text-right">Playable</Label>
-                  <div className="col-span-3">
-                    <Input 
-                      id="is_playable" 
-                      name="is_playable"
-                      type="checkbox"
-                      checked={formData.is_playable}
-                      onChange={handleInputChange}
-                      className="h-4 w-4"
-                    />
-                    <Label htmlFor="is_playable" className="ml-2">
-                      Character can be played by users
-                    </Label>
-                  </div>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => {
-                  setOpen(false);
-                  resetForm();
-                }}>
-                  Cancel
-                </Button>
-                <Button type="submit" className="bg-purple-600 hover:bg-purple-700">
-                  {editCharacter ? 'Save Changes' : 'Add Character'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </header>
+      <AdminHeader 
+        title="Character Management"
+        description="Create and manage superhero characters"
+        onAddNew={openAddDialog}
+        addButtonText="Add Character"
+      />
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editItem ? 'Edit Character' : 'Add New Character'}</DialogTitle>
+            <DialogDescription>
+              {editItem 
+                ? `Make changes to ${editItem.name}.` 
+                : 'Fill out the form below to create a new character.'}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleFormSubmit}>
+            <div className="grid gap-4 py-4">
+              <FormField 
+                id="name" 
+                label="Name" 
+                value={formData.name} 
+                onChange={handleInputChange} 
+                required 
+              />
+              
+              <FormField 
+                id="role" 
+                label="Role" 
+                value={formData.role} 
+                onChange={handleInputChange} 
+                required 
+              />
+              
+              <FormField 
+                id="backstory" 
+                label="Backstory" 
+                value={formData.backstory} 
+                onChange={handleInputChange} 
+              />
+              
+              <FormField 
+                id="abilities" 
+                label="Abilities" 
+                value={formData.abilities} 
+                onChange={handleInputChange} 
+                placeholder="Super strength, Flight, etc. (comma separated)"
+              />
+              
+              <CheckboxField 
+                id="is_playable"
+                label="Playable"
+                checked={formData.is_playable}
+                onChange={handleInputChange}
+                description="Character can be played by users"
+              />
+            </div>
+            <AdminDialogFooter 
+              onCancel={handleCancel}
+              isEditing={!!editItem}
+              isSubmitting={submitting}
+            />
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {isLoading ? (
-        <div className="flex justify-center my-12">
-          <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-        </div>
+        <LoadingState />
       ) : characters?.length === 0 ? (
-        <div className="text-center my-12 p-8 border border-dashed rounded-lg">
-          <User className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium mb-2">No characters found</h3>
-          <p className="text-gray-600 mb-4">Start by adding some characters to your game.</p>
-          <Button 
-            onClick={() => setOpen(true)}
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add First Character
-          </Button>
-        </div>
+        <AdminEmptyState 
+          icon={User}
+          title="No characters found"
+          description="Start by adding some characters to your game."
+          onAddNew={openAddDialog}
+          addButtonText="Add First Character"
+        />
       ) : (
         <Table>
           <TableCaption>A list of all characters in the game.</TableCaption>
@@ -319,36 +248,22 @@ const CharactersAdmin: React.FC = () => {
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {character.abilities.map((ability, index) => (
-                      <span 
-                        key={index} 
-                        className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
-                      >
-                        {ability}
-                      </span>
+                      <AdminTag key={index} text={ability} />
                     ))}
                   </div>
                 </TableCell>
                 <TableCell>
-                  {character.is_playable ? 
-                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Yes</span> : 
-                    <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">No</span>
-                  }
+                  <AdminStatus 
+                    value={character.is_playable}
+                    activeText="Yes"
+                    inactiveText="No"
+                  />
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => openEditDialog(character)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(character.id, character.name)}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
+                  <AdminItemActions
+                    onEdit={() => handleOpenEditDialog(character)}
+                    onDelete={() => handleDelete(character.id, character.name)}
+                  />
                 </TableCell>
               </TableRow>
             ))}
