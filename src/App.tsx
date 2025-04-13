@@ -2,6 +2,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
@@ -25,21 +26,23 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <BrowserRouter>
-          <Routes>
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/" element={<RequireAuth><Index /></RequireAuth>} />
-            <Route path="/character-stats" element={<RequireAuth><CharacterStats /></RequireAuth>} />
-            <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
-            <Route path="/admin/characters" element={<RequireAuth><Characters /></RequireAuth>} />
-            <Route path="/admin/inventory" element={<RequireAuth><Inventory /></RequireAuth>} />
-            <Route path="/admin/stories" element={<RequireAuth><Stories /></RequireAuth>} />
-            <Route path="/admin/missions" element={<RequireAuth><Missions /></RequireAuth>} />
-            <Route path="/admin/map" element={<RequireAuth><Locations /></RequireAuth>} />
-            <Route path="/admin/abilities" element={<RequireAuth><Abilities /></RequireAuth>} />
-            <Route path="/admin/roles" element={<RequireAuth><Roles /></RequireAuth>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Toaster />
+          <AuthProvider>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/" element={<RequireAuth><Index /></RequireAuth>} />
+              <Route path="/character-stats" element={<RequireAuth><CharacterStats /></RequireAuth>} />
+              <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
+              <Route path="/admin/characters" element={<RequireAuth><Characters /></RequireAuth>} />
+              <Route path="/admin/inventory" element={<RequireAuth><Inventory /></RequireAuth>} />
+              <Route path="/admin/stories" element={<RequireAuth><Stories /></RequireAuth>} />
+              <Route path="/admin/missions" element={<RequireAuth><Missions /></RequireAuth>} />
+              <Route path="/admin/map" element={<RequireAuth><Locations /></RequireAuth>} />
+              <Route path="/admin/abilities" element={<RequireAuth><Abilities /></RequireAuth>} />
+              <Route path="/admin/roles" element={<RequireAuth><Roles /></RequireAuth>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Toaster />
+          </AuthProvider>
         </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>

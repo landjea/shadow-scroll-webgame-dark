@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { TableName } from '@/types/supabase';
+import { TableName, TableTypes } from '@/types/supabase';
 
 interface UseAdminTableProps {
   tableName: TableName;
@@ -20,7 +20,7 @@ export function useAdminTable<T>({ tableName, queryKey, orderByField = 'created_
     queryKey: [queryKey],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from(tableName)
+        .from(tableName as keyof TableTypes)
         .select('*')
         .order(orderByField);
         
@@ -34,7 +34,7 @@ export function useAdminTable<T>({ tableName, queryKey, orderByField = 'created_
     
     try {
       const { error } = await supabase
-        .from(tableName)
+        .from(tableName as keyof TableTypes)
         .delete()
         .eq('id', id);
         

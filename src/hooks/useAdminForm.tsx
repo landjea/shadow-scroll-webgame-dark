@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { TableName } from '@/types/supabase';
+import { TableName, TableTypes } from '@/types/supabase';
 
 interface UseAdminFormProps<T, F> {
   tableName: TableName;
@@ -52,7 +52,7 @@ export function useAdminForm<T extends { id: string }, F>({
       if (editItem) {
         // Update existing item
         const { error } = await supabase
-          .from(tableName)
+          .from(tableName as keyof TableTypes)
           .update(formData as any)
           .eq('id', editItem.id);
           
@@ -65,7 +65,7 @@ export function useAdminForm<T extends { id: string }, F>({
       } else {
         // Create new item
         const { error } = await supabase
-          .from(tableName)
+          .from(tableName as keyof TableTypes)
           .insert(formData as any);
           
         if (error) throw error;
