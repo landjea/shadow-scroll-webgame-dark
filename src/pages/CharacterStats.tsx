@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import AdminLayout from '@/components/admin/AdminLayout';
 
 interface CharacterStat {
   id: string;
@@ -192,7 +193,7 @@ const CharacterStats: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
+    <AdminLayout>
       <div className="flex items-center mb-6">
         <Button
           variant="ghost"
@@ -450,7 +451,7 @@ const CharacterStats: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminLayout>
   );
 };
 
