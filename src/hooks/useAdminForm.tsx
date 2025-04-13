@@ -21,6 +21,11 @@ export function useAdminForm<T extends { id: string }, F>({
   const [formData, setFormData] = useState<F>(initialFormState);
   const [submitting, setSubmitting] = useState(false);
   
+  // Type assertion to ensure tableName is recognized as a valid table name
+  const tableNameKey = tableName as "character_stats" | "characters" | "game_actions" | 
+    "game_saves" | "inventory_items" | "map_locations" | "missions" | 
+    "stories" | "user_roles" | "abilities";
+  
   const resetForm = () => {
     setFormData(initialFormState);
   };
@@ -52,7 +57,7 @@ export function useAdminForm<T extends { id: string }, F>({
       if (editItem) {
         // Update existing item
         const { error } = await supabase
-          .from(tableName as keyof TableTypes)
+          .from(tableNameKey)
           .update(formData as any)
           .eq('id', editItem.id);
           
@@ -65,7 +70,7 @@ export function useAdminForm<T extends { id: string }, F>({
       } else {
         // Create new item
         const { error } = await supabase
-          .from(tableName as keyof TableTypes)
+          .from(tableNameKey)
           .insert(formData as any);
           
         if (error) throw error;
