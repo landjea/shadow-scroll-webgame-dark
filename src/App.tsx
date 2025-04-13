@@ -18,6 +18,8 @@ import CharactersAdmin from "./pages/admin/Characters";
 import MissionsAdmin from "./pages/admin/Missions";
 import StoriesAdmin from "./pages/admin/Stories";
 import LocationsAdmin from "./pages/admin/Locations";
+import AbilitiesAdmin from "./pages/admin/Abilities";
+import RolesAdmin from "./pages/admin/Roles";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -78,6 +80,16 @@ const App = () => {
               <Route path="/admin/map" element={
                 <RequireAuth adminOnly>
                   <LocationsAdmin />
+                </RequireAuth>
+              } />
+              <Route path="/admin/abilities" element={
+                <RequireAuth adminOnly>
+                  <AbilitiesAdmin />
+                </RequireAuth>
+              } />
+              <Route path="/admin/roles" element={
+                <RequireAuth adminOnly>
+                  <RolesAdmin />
                 </RequireAuth>
               } />
               

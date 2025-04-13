@@ -55,3 +55,22 @@ export interface Location {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface UserRole {
+  id: string;
+  user_id: string;
+  role: 'admin' | 'moderator' | 'player';
+  user_email?: string;
+}
+
+export interface Ability {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  energy_cost: number;
+  cooldown: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}

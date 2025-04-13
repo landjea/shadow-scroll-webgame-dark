@@ -109,6 +109,19 @@ export interface Database {
           role: 'admin' | 'moderator' | 'player';
         };
       };
+      abilities: {
+        Row: {
+          id: string;
+          name: string;
+          description: string;
+          type: string;
+          energy_cost: number;
+          cooldown: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+      };
     };
     Views: {};
     Functions: {};
