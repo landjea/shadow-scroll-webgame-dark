@@ -17,14 +17,14 @@ export type TableName =
 
 // Create a type that maps a TableName to its actual type
 export type TableTypes = {
-  characters: any;
-  character_stats: any;
-  game_actions: any;
-  game_saves: any;
-  inventory_items: any;
-  map_locations: any;
-  missions: any;
-  stories: any;
-  user_roles: any;
-  abilities: any;
+  characters: Database['public']['Tables']['characters']['Row'];
+  character_stats: Database['public']['Tables']['character_stats']['Row'];
+  game_actions: Database['public']['Tables']['game_actions']['Row'];
+  game_saves: Database['public']['Tables']['game_saves']['Row'];
+  inventory_items: Database['public']['Tables']['inventory_items']['Row'];
+  map_locations: Database['public']['Tables']['map_locations']['Row'];
+  missions: Database['public']['Tables']['missions']['Row'];
+  stories: Database['public']['Tables']['stories']['Row'];
+  user_roles: Database['public']['Tables']['user_roles']['Row'];
+  abilities: Database['public']['Tables']['abilities']['Row'];
 }

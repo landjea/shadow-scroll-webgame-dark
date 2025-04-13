@@ -20,7 +20,7 @@ export function useAdminTable<T>({ tableName, queryKey, orderByField = 'created_
     queryKey: [queryKey],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from(tableName as string)
+        .from(tableName)
         .select('*')
         .order(orderByField);
         
@@ -34,7 +34,7 @@ export function useAdminTable<T>({ tableName, queryKey, orderByField = 'created_
     
     try {
       const { error } = await supabase
-        .from(tableName as string)
+        .from(tableName)
         .delete()
         .eq('id', id);
         
