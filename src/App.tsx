@@ -1,105 +1,48 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
-import { RequireAuth } from "./components/RequireAuth";
-import Index from "./pages/Index";
-import Admin from "./pages/Admin";
-import CharacterStats from "./pages/CharacterStats";
-import Auth from "./pages/Auth";
-import NotFound from "./pages/NotFound";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// Admin pages
-import InventoryAdmin from "./pages/admin/Inventory";
-import CharactersAdmin from "./pages/admin/Characters";
-import MissionsAdmin from "./pages/admin/Missions";
-import StoriesAdmin from "./pages/admin/Stories";
-import LocationsAdmin from "./pages/admin/Locations";
-import AbilitiesAdmin from "./pages/admin/Abilities";
-import RolesAdmin from "./pages/admin/Roles";
+import Index from '@/pages/Index';
+import Auth from '@/pages/Auth';
+import NotFound from '@/pages/NotFound';
+import RequireAuth from '@/components/RequireAuth';
+import Admin from '@/pages/Admin';
+import CharacterStats from '@/pages/CharacterStats';
+import Characters from '@/pages/admin/Characters';
+import Inventory from '@/pages/admin/Inventory';
+import Stories from '@/pages/admin/Stories';
+import Missions from '@/pages/admin/Missions';
+import Locations from '@/pages/admin/Locations';
+import Abilities from '@/pages/admin/Abilities';
+import Roles from '@/pages/admin/Roles';
+import { Toaster } from '@/components/ui/toaster';
 
-// Create a client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-    },
-  },
-});
+const queryClient = new QueryClient();
 
-const App = () => {
+function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/" element={
-                <RequireAuth>
-                  <Index />
-                </RequireAuth>
-              } />
-              <Route path="/admin" element={
-                <RequireAuth adminOnly>
-                  <Admin />
-                </RequireAuth>
-              } />
-              <Route path="/character-stats" element={
-                <RequireAuth adminOnly>
-                  <CharacterStats />
-                </RequireAuth>
-              } />
-              
-              {/* Admin routes */}
-              <Route path="/admin/inventory" element={
-                <RequireAuth adminOnly>
-                  <InventoryAdmin />
-                </RequireAuth>
-              } />
-              <Route path="/admin/characters" element={
-                <RequireAuth adminOnly>
-                  <CharactersAdmin />
-                </RequireAuth>
-              } />
-              <Route path="/admin/missions" element={
-                <RequireAuth adminOnly>
-                  <MissionsAdmin />
-                </RequireAuth>
-              } />
-              <Route path="/admin/stories" element={
-                <RequireAuth adminOnly>
-                  <StoriesAdmin />
-                </RequireAuth>
-              } />
-              <Route path="/admin/map" element={
-                <RequireAuth adminOnly>
-                  <LocationsAdmin />
-                </RequireAuth>
-              } />
-              <Route path="/admin/abilities" element={
-                <RequireAuth adminOnly>
-                  <AbilitiesAdmin />
-                </RequireAuth>
-              } />
-              <Route path="/admin/roles" element={
-                <RequireAuth adminOnly>
-                  <RolesAdmin />
-                </RequireAuth>
-              } />
-              
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </TooltipProvider>
-        </QueryClientProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/" element={<RequireAuth><Index /></RequireAuth>} />
+            <Route path="/character-stats" element={<RequireAuth><CharacterStats /></RequireAuth>} />
+            <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
+            <Route path="/admin/characters" element={<RequireAuth><Characters /></RequireAuth>} />
+            <Route path="/admin/inventory" element={<RequireAuth><Inventory /></RequireAuth>} />
+            <Route path="/admin/stories" element={<RequireAuth><Stories /></RequireAuth>} />
+            <Route path="/admin/missions" element={<RequireAuth><Missions /></RequireAuth>} />
+            <Route path="/admin/map" element={<RequireAuth><Locations /></RequireAuth>} />
+            <Route path="/admin/abilities" element={<RequireAuth><Abilities /></RequireAuth>} />
+            <Route path="/admin/roles" element={<RequireAuth><Roles /></RequireAuth>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster />
+        </BrowserRouter>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 

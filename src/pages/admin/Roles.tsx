@@ -1,35 +1,17 @@
 
 import React, { useState } from 'react';
-import { Shield, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { UserRole } from '@/types/admin';
-import { supabase } from '@/integrations/supabase/client';
+import { Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { UserRole } from '@/types/admin';
 import AdminLayout from '@/components/admin/AdminLayout';
 import AdminHeader from '@/components/admin/AdminHeader';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import LoadingState from '@/components/admin/LoadingState';
-import AdminItemActions from '@/components/admin/AdminItemActions';
-import AdminDialogFooter from '@/components/admin/DialogFooter';
+import SearchBox from '@/components/admin/roles/SearchBox';
+import RolesTable from '@/components/admin/roles/RolesTable';
+import RoleForm from '@/components/admin/roles/RoleForm';
 
 // Defining the role type to match the database schema
 type AppRole = 'admin' | 'player';
@@ -185,15 +167,11 @@ const RolesAdmin: React.FC = () => {
       />
 
       <div className="flex mb-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            placeholder="Search by email..."
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+        <SearchBox 
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search by email..."
+        />
       </div>
 
       {isLoading ? (
@@ -207,86 +185,22 @@ const RolesAdmin: React.FC = () => {
           addButtonText="Add First Role"
         />
       ) : (
-        <Table>
-          <TableCaption>A list of all user roles in the system.</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>User Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredRoles.map((role) => (
-              <TableRow key={role.id}>
-                <TableCell className="font-medium">{role.user_email}</TableCell>
-                <TableCell>
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                    ${role.role === 'admin' ? 'bg-purple-100 text-purple-800' : 
-                     role.role === 'moderator' ? 'bg-blue-100 text-blue-800' : 
-                     'bg-green-100 text-green-800'}`}>
-                    {role.role}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <AdminItemActions
-                    onEdit={() => {}}
-                    onDelete={() => handleDelete(role.id, role.user_email || '')}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <RolesTable 
+          roles={filteredRoles} 
+          onDelete={handleDelete} 
+        />
       )}
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add User Role</DialogTitle>
-            <DialogDescription>
-              Assign a role to a user by email address.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleAddRole}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="userEmail" className="text-right">User Email</Label>
-                <Input 
-                  id="userEmail" 
-                  type="email"
-                  value={userEmail}
-                  onChange={(e) => setUserEmail(e.target.value)}
-                  className="col-span-3" 
-                  required
-                  placeholder="user@example.com"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="role" className="text-right">Role</Label>
-                <select
-                  id="role"
-                  value={selectedRole}
-                  onChange={(e) => setSelectedRole(e.target.value as AppRole)}
-                  className="col-span-3 flex h-9 w-full rounded-md border border-input bg-background px-3 py-1"
-                >
-                  <option value="player">Player</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-            </div>
-            <AdminDialogFooter
-              onCancel={() => {
-                setDialogOpen(false);
-                setUserEmail('');
-                setSelectedRole('player');
-              }}
-              isEditing={false}
-              isSubmitting={submitting}
-            />
-          </form>
-        </DialogContent>
-      </Dialog>
+      <RoleForm
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        userEmail={userEmail}
+        setUserEmail={setUserEmail}
+        selectedRole={selectedRole}
+        setSelectedRole={setSelectedRole}
+        onSubmit={handleAddRole}
+        isSubmitting={submitting}
+      />
     </AdminLayout>
   );
 };

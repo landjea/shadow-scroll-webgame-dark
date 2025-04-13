@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { ThemeSelector } from '@/components/ui/theme-selector';
 import AdminSidebar from './AdminSidebar';
 
 interface AdminLayoutProps {
@@ -31,6 +32,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     <div className="flex min-h-screen bg-gray-50">
       <AdminSidebar />
       <main className="flex-1 p-6 overflow-y-auto">
+        <div className="flex justify-end mb-4">
+          <ThemeSelector />
+        </div>
         {children}
       </main>
     </div>

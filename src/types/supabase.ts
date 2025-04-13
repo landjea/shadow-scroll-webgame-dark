@@ -15,3 +15,16 @@ export type TableName =
   | 'user_roles'
   | 'abilities';
 
+// Create a type that maps a TableName to its actual type
+export type TableTypes = {
+  characters: any;
+  character_stats: any;
+  game_actions: any;
+  game_saves: any;
+  inventory_items: any;
+  map_locations: any;
+  missions: any;
+  stories: any;
+  user_roles: any;
+  abilities: any;
+}

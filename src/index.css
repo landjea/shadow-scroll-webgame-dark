@@ -4,7 +4,8 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  /* Starfire Theme (Default) */
+  .theme-starfire {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
@@ -25,15 +26,54 @@
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
     --radius: 0.5rem;
-    
-    /* Sunset color palette */
-    --sunset-dark: #2F2E33;
-    --sunset-purple: #5B3C80;
-    --sunset-purple-light: #744C9E;
-    --sunset-red: #FE5F55;
-    --sunset-green: #BCD8C1;
-    --sunset-white: #F0EBF4;
-    --sunset-grey: #A3A1A8;
+  }
+
+  /* Batman Theme */
+  .theme-batman {
+    --background: 222 20% 10%;
+    --foreground: 0 0% 98%;
+    --card: 223 22% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 222 20% 9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 45 100% 50%;
+    --primary-foreground: 20 14.3% 4.1%;
+    --secondary: 217 19% 27%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 217 19% 27%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 45 100% 50%;
+    --accent-foreground: 20 14.3% 4.1%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 45 100% 50%;
+    --radius: 0.5rem;
+  }
+
+  /* Superman Theme */
+  .theme-superman {
+    --background: 210 100% 97%;
+    --foreground: 221 39% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 221 39% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 221 39% 11%;
+    --primary: 359 83% 57%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 199 89% 49%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 199 89% 49%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 199 89% 49%;
+    --radius: 0.5rem;
   }
 
   * {

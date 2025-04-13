@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -78,6 +79,20 @@ export default {
 					green: '#BCD8C1',
 					white: '#F0EBF4',
 					grey: '#A3A1A8'
+				},
+				// Batman theme colors
+				batman: {
+					dark: '#1A1F2C',
+					black: '#000000e6',
+					'dark-accent': '#0006',
+					gray: '#2226',
+					gold: '#FFC700',
+				},
+				// Superman theme colors
+				superman: {
+					red: '#ea384c',
+					blue: '#1EAEDB',
+					yellow: '#FEF7CD',
 				}
 			},
 			fontFamily: {
