@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Shield, Search, Loader2 } from 'lucide-react';
+import { Shield, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -31,14 +31,16 @@ import LoadingState from '@/components/admin/LoadingState';
 import AdminItemActions from '@/components/admin/AdminItemActions';
 import AdminDialogFooter from '@/components/admin/DialogFooter';
 
+// Defining the role type to match the database schema
+type AppRole = 'admin' | 'player';
+
 const RolesAdmin: React.FC = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editRole, setEditRole] = useState<UserRole | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [userEmail, setUserEmail] = useState('');
-  const [selectedRole, setSelectedRole] = useState<'admin' | 'moderator' | 'player'>('player');
+  const [selectedRole, setSelectedRole] = useState<AppRole>('player');
 
   const {
     data: roles,
@@ -227,13 +229,10 @@ const RolesAdmin: React.FC = () => {
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(role.id, role.user_email || '')}
-                  >
-                    <Shield className="h-4 w-4 text-red-500" />
-                  </Button>
+                  <AdminItemActions
+                    onEdit={() => {}}
+                    onDelete={() => handleDelete(role.id, role.user_email || '')}
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -268,11 +267,10 @@ const RolesAdmin: React.FC = () => {
                 <select
                   id="role"
                   value={selectedRole}
-                  onChange={(e) => setSelectedRole(e.target.value as 'admin' | 'moderator' | 'player')}
+                  onChange={(e) => setSelectedRole(e.target.value as AppRole)}
                   className="col-span-3 flex h-9 w-full rounded-md border border-input bg-background px-3 py-1"
                 >
                   <option value="player">Player</option>
-                  <option value="moderator">Moderator</option>
                   <option value="admin">Admin</option>
                 </select>
               </div>
