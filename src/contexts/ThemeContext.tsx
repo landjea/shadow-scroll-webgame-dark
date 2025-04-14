@@ -24,10 +24,18 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     // Save the theme preference to localStorage
     localStorage.setItem('theme', theme);
+    
+    // Log to verify theme change is happening
+    console.log(`Theme changed to: ${theme}`);
   }, [theme]);
 
+  const contextValue = {
+    theme,
+    setTheme
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );

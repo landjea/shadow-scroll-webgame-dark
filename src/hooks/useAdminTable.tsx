@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,11 +16,14 @@ export function useAdminTable<T>({ tableName, queryKey, orderByField = 'created_
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editItem, setEditItem] = useState<T | null>(null);
   
+  // Type assertion to ensure tableName is recognized as a valid table name
+  const tableNameKey = tableName as keyof TableTypes;
+  
   const { data: items, isLoading, refetch } = useQuery({
     queryKey: [queryKey],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from(tableName)
+        .from(tableNameKey)
         .select('*')
         .order(orderByField);
         
@@ -33,7 +37,7 @@ export function useAdminTable<T>({ tableName, queryKey, orderByField = 'created_
     
     try {
       const { error } = await supabase
-        .from(tableName)
+        .from(tableNameKey)
         .delete()
         .eq('id', id);
         

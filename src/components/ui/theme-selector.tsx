@@ -37,18 +37,24 @@ const themeOptions: ThemeOption[] = [
 export function ThemeSelector() {
   const { theme, setTheme } = useTheme();
 
+  const handleThemeChange = (newTheme: 'starfire' | 'batman' | 'superman') => {
+    console.log(`Setting theme to: ${newTheme}`);
+    setTheme(newTheme);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-9 w-9 rounded-md">
           <Palette className="h-4 w-4" />
+          <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {themeOptions.map((option) => (
           <DropdownMenuItem
             key={option.value}
-            onClick={() => setTheme(option.value)}
+            onClick={() => handleThemeChange(option.value)}
             className={`flex items-center gap-2 ${theme === option.value ? 'bg-accent' : ''}`}
           >
             {option.icon}
