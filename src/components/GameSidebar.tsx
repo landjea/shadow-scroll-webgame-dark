@@ -13,9 +13,16 @@ import { Button } from '@/components/ui/button';
 interface GameSidebarProps {
   heroSpeed: number;
   characterStats?: any;
+  isOpen?: boolean;
+  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) => {
+const GameSidebar: React.FC<GameSidebarProps> = ({ 
+  heroSpeed, 
+  characterStats,
+  isOpen,
+  setIsOpen
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { signOut, isAdmin, user } = useAuth();
@@ -101,7 +108,7 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) 
   console.log("Current location:", location.pathname);
 
   return (
-    <div className="h-full w-full bg-purple-950 border-r border-purple-900/80 flex flex-col">
+    <div className="h-full w-full bg-purple-950 border-r border-purple-900/80 flex flex-col sidebar">
       {/* User Profile Section */}
       <div className="p-4 border-b border-purple-900/80">
         <Popover>

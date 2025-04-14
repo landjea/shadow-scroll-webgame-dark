@@ -22,19 +22,19 @@ const themeOptions: ThemeOption[] = [
   {
     name: 'Starfire',
     value: 'starfire',
-    icon: <div className="w-4 h-4 rounded-full bg-purple-600" />,
+    icon: <div className="w-5 h-5 rounded-full bg-[#2D1B69] border border-white/20" />,
     description: 'A heroic purple theme'
   },
   {
     name: 'Batman',
     value: 'batman',
-    icon: <div className="w-4 h-4 rounded-full bg-black border border-yellow-500" />,
+    icon: <div className="w-5 h-5 rounded-full bg-[#1A1A1A] border border-yellow-500" />,
     description: 'Dark, mysterious theme'
   },
   {
     name: 'Superman',
     value: 'superman',
-    icon: <div className="w-4 h-4 rounded-full bg-gradient-to-r from-red-600 to-blue-600" />,
+    icon: <div className="w-5 h-5 rounded-full bg-[#0A3161] border-2 border-red-600" />,
     description: 'Bold, bright theme'
   }
 ];
@@ -58,11 +58,20 @@ export function ThemeSelector() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button 
-          variant="ghost" 
+          variant="outline" 
           size="icon" 
-          className="h-8 w-8 rounded-full transition-colors duration-200 bg-purple-900/50 hover:bg-purple-800"
+          className="h-9 w-9 rounded-full transition-colors duration-200 border-2"
+          style={{
+            background: theme === 'starfire' ? '#2D1B69' : 
+                      theme === 'batman' ? '#1A1A1A' : '#0A3161',
+            borderColor: theme === 'starfire' ? '#D946EF' : 
+                        theme === 'batman' ? '#FFC700' : '#EA384C'
+          }}
         >
-          <Palette className="h-4 w-4 text-purple-300" />
+          <Palette className="h-5 w-5" style={{
+            color: theme === 'starfire' ? '#D946EF' : 
+                 theme === 'batman' ? '#FFC700' : '#EA384C'
+          }} />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
@@ -74,7 +83,7 @@ export function ThemeSelector() {
           <DropdownMenuItem
             key={option.value}
             onClick={() => handleThemeChange(option.value)}
-            className={`flex items-center gap-2 py-2 ${theme === option.value ? 'bg-accent' : ''}`}
+            className={`flex items-center gap-3 py-3 ${theme === option.value ? 'bg-accent' : ''}`}
           >
             {option.icon}
             <div className="flex flex-col">

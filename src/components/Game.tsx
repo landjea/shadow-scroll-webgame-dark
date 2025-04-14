@@ -10,11 +10,6 @@ import GameActionLog from './GameActionLog';
 import { useGameState } from '@/hooks/useGameState';
 import ThemeDebug from './ThemeDebug';
 
-interface GameSidebarProps {
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
 const Game: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -55,7 +50,10 @@ const Game: React.FC = () => {
       
       <div className="flex flex-1 pt-14 overflow-hidden">
         {/* Sidebar for inventory, abilities, etc */}
-        <GameSidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+        <GameSidebar 
+          heroSpeed={heroSpeed} 
+          characterStats={undefined}
+        />
         
         {/* Main game grid area */}
         <main className={`flex-1 ${isOpen && isMobile ? 'hidden' : 'flex flex-col'} overflow-hidden`}>
@@ -72,16 +70,14 @@ const Game: React.FC = () => {
             
             {/* Game log console (fixed at bottom) */}
             <div className="absolute bottom-0 w-full">
-              <GameConsole>
-                <div className="flex flex-col space-y-4 px-4 py-3">
-                  <GameAvailableActions 
-                    actions={gameActions} 
-                    onAction={handleAction} 
-                    heroEnergy={heroEnergy}
-                  />
-                  <GameActionLog entries={actionLog} />
-                </div>
-              </GameConsole>
+              <div className="flex flex-col space-y-4 px-4 py-3 bg-purple-950/80 border-t border-purple-900/50">
+                <GameAvailableActions 
+                  actions={gameActions} 
+                  onAction={handleAction} 
+                  heroEnergy={heroEnergy}
+                />
+                <GameActionLog entries={actionLog} />
+              </div>
             </div>
           </div>
         </main>

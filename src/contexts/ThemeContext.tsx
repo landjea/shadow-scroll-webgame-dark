@@ -18,9 +18,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   });
 
   useEffect(() => {
-    // Remove previous theme classes and add the new one
+    // Remove previous theme classes and add the new one to both html and body
     document.documentElement.classList.remove('theme-starfire', 'theme-batman', 'theme-superman');
     document.documentElement.classList.add(`theme-${theme}`);
+    
+    document.body.classList.remove('theme-starfire', 'theme-batman', 'theme-superman');
+    document.body.classList.add(`theme-${theme}`);
     
     // Apply theme colors directly to body
     let bgColor = '#2D1B69';
@@ -42,7 +45,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.setItem('theme', theme);
     
     // Log to verify theme change is happening
-    console.log(`Theme changed to: ${theme}`);
+    console.log(`Theme changed to: ${theme} - Background: ${bgColor}, Text: ${textColor}`);
   }, [theme]);
 
   const contextValue = {

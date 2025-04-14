@@ -2,14 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { MapPin, Building, Car as RoadIcon, Trees as Park, Shield as PoliceIcon, Hospital as HospitalIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-export interface LocationType {
-  id: string;
-  name: string;
-  type: 'hospital' | 'police' | 'mall' | 'suburb' | 'park' | 'street';
-  x: number;
-  y: number;
-}
+import { LocationType } from '@/types/game';
 
 interface LocationIconProps {
   type: LocationType['type'];
@@ -76,7 +69,7 @@ const CityGrid: React.FC<CityGridProps> = ({
         // Find if there's a location at these coordinates in the original grid
         let location: LocationType | undefined;
         
-        if (worldY >= 0 && worldY < grid.length && 
+        if (grid && worldY >= 0 && worldY < grid.length && 
             worldX >= 0 && grid[worldY] && worldX < grid[worldY].length) {
           location = grid[worldY][worldX];
         }
@@ -141,7 +134,7 @@ const CityGrid: React.FC<CityGridProps> = ({
             
             return (
               <button
-                key={`${location.id}-${location.x}-${location.y}`}
+                key={`loc-${location.x}-${location.y}`}
                 onClick={() => isReachable && onLocationSelect(location)}
                 className={cn(
                   "relative h-12 p-1 rounded flex flex-col items-center justify-center text-xs transition-all",

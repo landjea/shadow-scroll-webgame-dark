@@ -17,10 +17,16 @@ const ThemeDebug: React.FC = () => {
     }
   };
   
+  const getActualColors = () => {
+    const computedStyle = getComputedStyle(document.body);
+    return `actual bg: ${computedStyle.backgroundColor}, actual text: ${computedStyle.color}`;
+  };
+  
   return (
     <div className="fixed bottom-0 left-0 p-2 bg-background text-foreground border-r border-t border-border z-50 text-xs">
       <p>Current Theme: {theme}</p>
       <p className="text-[10px] opacity-70">{getThemeColors()}</p>
+      <p className="text-[10px] opacity-70">{getActualColors()}</p>
     </div>
   );
 };

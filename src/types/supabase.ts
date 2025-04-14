@@ -28,3 +28,10 @@ export type TableTypes = {
   user_roles: Database['public']['Tables']['user_roles']['Row'];
   abilities: any; // Temporary solution until proper type is available
 }
+
+// Type guard to check if a string is a valid TableName
+export function isValidTableName(name: string): name is TableName {
+  return ['characters', 'character_stats', 'game_actions', 'game_saves', 
+          'inventory_items', 'map_locations', 'missions', 'stories', 
+          'user_roles', 'abilities'].includes(name);
+}
