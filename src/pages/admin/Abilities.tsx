@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Zap } from 'lucide-react';
 import { useAdminTable } from '@/hooks/useAdminTable';
 import { useAdminForm } from '@/hooks/useAdminForm';
@@ -21,7 +21,7 @@ const initialFormState = {
 };
 
 const AbilitiesAdmin: React.FC = () => {
-  const [editAbility, setEditAbility] = useState<Ability | null>(null);
+  const [editAbility, setEditAbility] = React.useState<Ability | null>(null);
   
   const {
     items: abilities,
@@ -44,17 +44,9 @@ const AbilitiesAdmin: React.FC = () => {
     resetForm,
     setFormForEditing,
     submitting
-  } = useAdminForm<Ability, typeof initialFormState>({
+  } = useAdminForm<Ability>({
     tableName: 'abilities',
     initialFormState,
-    itemToFormData: (ability) => ({
-      name: ability.name,
-      description: ability.description || '',
-      type: ability.type,
-      energy_cost: ability.energy_cost,
-      cooldown: ability.cooldown,
-      is_active: ability.is_active
-    }),
     onSuccess: () => {
       setDialogOpen(false);
       setEditAbility(null);

@@ -2,13 +2,14 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { TableName, TableTypes } from '@/types/supabase';
+import { TableName } from '@/types/supabase';
 
 interface UseAdminFormProps<F> {
   tableName: TableName;
   initialFormState: F;
   onSuccess?: () => void;
   validateForm?: (data: F) => boolean;
+  itemToFormData?: (item: any) => F;
 }
 
 export function useAdminForm<F extends Record<string, any>>({
@@ -16,6 +17,7 @@ export function useAdminForm<F extends Record<string, any>>({
   initialFormState,
   onSuccess,
   validateForm,
+  itemToFormData,
 }: UseAdminFormProps<F>) {
   const { toast } = useToast();
   const [formData, setFormData] = useState<F>(initialFormState);
@@ -32,7 +34,35 @@ export function useAdminForm<F extends Record<string, any>>({
     }));
   };
 
-  const handleSubmit = async (editItem: F | null) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target as HTMLInputElement;
+    
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      updateFormField(name as keyof F, checked);
+    } else {
+      updateFormField(name as keyof F, value);
+    }
+  };
+
+  const setFormForEditing = (item: any) => {
+    if (itemToFormData) {
+      setFormData(itemToFormData(item));
+    } else {
+      // Default behavior: copy all fields from item to formData
+      const newFormData = { ...initialFormState };
+      Object.keys(initialFormState).forEach(key => {
+        if (key in item) {
+          (newFormData as any)[key] = item[key];
+        }
+      });
+      setFormData(newFormData);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent, editItem: any = null) => {
+    e.preventDefault();
+    
     // If a validation function is provided, run it
     if (validateForm && !validateForm(formData)) {
       toast({
@@ -94,6 +124,8 @@ export function useAdminForm<F extends Record<string, any>>({
     updateFormField,
     resetForm,
     submitting,
-    handleSubmit
+    handleSubmit,
+    handleInputChange,
+    setFormForEditing
   };
 }

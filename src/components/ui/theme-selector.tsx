@@ -20,7 +20,7 @@ const themeOptions: ThemeOption[] = [
   {
     name: 'Starfire',
     value: 'starfire',
-    icon: <div className="w-4 h-4 rounded-full bg-game-accent" />
+    icon: <div className="w-4 h-4 rounded-full bg-purple-600" />
   },
   {
     name: 'Batman',

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { TableName, TableTypes } from '@/types/supabase';
+import { TableName } from '@/types/supabase';
 
 interface UseAdminTableProps {
   tableName: TableName;
