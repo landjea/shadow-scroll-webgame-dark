@@ -10,10 +10,26 @@ import GameActionLog from './GameActionLog';
 import { useGameState } from '@/hooks/useGameState';
 import ThemeDebug from './ThemeDebug';
 
+interface GameSidebarProps {
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 const Game: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
-  const { heroHealth, heroEnergy, heroSpeed } = useGameState();
+  const {
+    cityGrid,
+    currentLocation,
+    gameStatus,
+    actionLog,
+    heroHealth,
+    heroEnergy,
+    heroSpeed,
+    gameActions,
+    handleAction,
+    handleLocationSelect
+  } = useGameState();
   
   useEffect(() => {
     // Close sidebar on mobile when clicking outside
@@ -44,14 +60,26 @@ const Game: React.FC = () => {
         {/* Main game grid area */}
         <main className={`flex-1 ${isOpen && isMobile ? 'hidden' : 'flex flex-col'} overflow-hidden`}>
           <div className="flex-1 overflow-hidden relative">
-            <CityGrid />
+            {cityGrid && currentLocation && (
+              <CityGrid 
+                grid={cityGrid}
+                currentLocation={currentLocation}
+                heroSpeed={heroSpeed}
+                heroStamina={heroEnergy}
+                onLocationSelect={handleLocationSelect}
+              />
+            )}
             
             {/* Game log console (fixed at bottom) */}
             <div className="absolute bottom-0 w-full">
               <GameConsole>
                 <div className="flex flex-col space-y-4 px-4 py-3">
-                  <GameAvailableActions />
-                  <GameActionLog />
+                  <GameAvailableActions 
+                    actions={gameActions} 
+                    onAction={handleAction} 
+                    heroEnergy={heroEnergy}
+                  />
+                  <GameActionLog entries={actionLog} />
                 </div>
               </GameConsole>
             </div>

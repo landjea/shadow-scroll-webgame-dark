@@ -35,7 +35,7 @@ const LocationIcon: React.FC<LocationIconProps> = ({ type, className }) => {
   }
 };
 
-interface CityGridProps {
+export interface CityGridProps {
   grid: LocationType[][];
   currentLocation: LocationType;
   heroSpeed: number;
@@ -55,6 +55,12 @@ const CityGrid: React.FC<CityGridProps> = ({
   const radius = Math.floor(gridSize / 2); // How far the grid extends from center (3 in each direction)
 
   useEffect(() => {
+    // Ensure we have a valid currentLocation before proceeding
+    if (!currentLocation || typeof currentLocation.x === 'undefined' || typeof currentLocation.y === 'undefined') {
+      console.error('Invalid currentLocation:', currentLocation);
+      return;
+    }
+
     // Generate a centered grid based on the current player position
     const newGrid: LocationType[][] = [];
     for (let y = 0; y < gridSize; y++) {
@@ -71,7 +77,7 @@ const CityGrid: React.FC<CityGridProps> = ({
         let location: LocationType | undefined;
         
         if (worldY >= 0 && worldY < grid.length && 
-            worldX >= 0 && worldX < grid[0].length) {
+            worldX >= 0 && grid[worldY] && worldX < grid[worldY].length) {
           location = grid[worldY][worldX];
         }
         
@@ -109,6 +115,8 @@ const CityGrid: React.FC<CityGridProps> = ({
   }, [currentLocation, grid]);
 
   const isLocationReachable = (location: LocationType): boolean => {
+    if (!currentLocation) return false;
+    
     if (location.x === currentLocation.x && location.y === currentLocation.y) {
       return false; // Current location is not reachable (already there)
     }
@@ -118,6 +126,10 @@ const CityGrid: React.FC<CityGridProps> = ({
     
     return distance <= heroSpeed && distance <= heroStamina;
   };
+
+  if (!currentLocation || !grid || grid.length === 0) {
+    return <div className="p-4 text-center">Loading map...</div>;
+  }
 
   return (
     <div className="grid grid-cols-7 gap-1 p-2 rounded-md border" style={{ background: "#2F2E33", borderColor: "#2F2E33" }}>

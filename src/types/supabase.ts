@@ -26,5 +26,5 @@ export type TableTypes = {
   missions: Database['public']['Tables']['missions']['Row'];
   stories: Database['public']['Tables']['stories']['Row'];
   user_roles: Database['public']['Tables']['user_roles']['Row'];
-  abilities: Database['public']['Tables']['abilities']['Row'];
+  abilities: any; // Temporary solution until proper type is available
 }

@@ -22,9 +22,21 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     document.documentElement.classList.remove('theme-starfire', 'theme-batman', 'theme-superman');
     document.documentElement.classList.add(`theme-${theme}`);
     
-    // Apply background color directly to body for better theme coverage
-    document.body.style.backgroundColor = 'var(--background)';
-    document.body.style.color = 'var(--foreground)';
+    // Apply theme colors directly to body
+    let bgColor = '#2D1B69';
+    let textColor = '#F8F9FA';
+    
+    if (theme === 'batman') {
+      bgColor = '#1A1A1A';
+      textColor = '#E6E6E6';
+    } else if (theme === 'superman') {
+      bgColor = '#0A3161';
+      textColor = '#F8F9FA';
+    }
+    
+    // Apply styles directly
+    document.body.style.backgroundColor = bgColor;
+    document.body.style.color = textColor;
     
     // Save the theme preference to localStorage
     localStorage.setItem('theme', theme);
