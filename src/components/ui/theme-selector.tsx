@@ -45,12 +45,12 @@ export function ThemeSelector() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-md">
-          <Palette className="h-4 w-4" />
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-purple-900/50 hover:bg-purple-800">
+          <Palette className="h-4 w-4 text-purple-300" />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-40">
         {themeOptions.map((option) => (
           <DropdownMenuItem
             key={option.value}

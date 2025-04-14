@@ -22,6 +22,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     document.documentElement.classList.remove('theme-starfire', 'theme-batman', 'theme-superman');
     document.documentElement.classList.add(`theme-${theme}`);
     
+    // Apply background color directly to body for better theme coverage
+    document.body.style.backgroundColor = 'var(--background)';
+    document.body.style.color = 'var(--foreground)';
+    
     // Save the theme preference to localStorage
     localStorage.setItem('theme', theme);
     

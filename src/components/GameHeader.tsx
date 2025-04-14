@@ -3,6 +3,7 @@ import React from 'react';
 import { Zap, Clock, Star, Bell, Heart, Activity } from "lucide-react";
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Progress } from "@/components/ui/progress";
+import { ThemeSelector } from "@/components/ui/theme-selector";
 
 interface GameHeaderProps {
   heroHealth: number;
@@ -72,6 +73,9 @@ const GameHeader: React.FC<GameHeaderProps> = ({
           <Bell size={18} />
           <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
+        
+        {/* Theme Selector */}
+        <ThemeSelector />
       </div>
     </header>
   );

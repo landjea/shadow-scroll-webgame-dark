@@ -4,58 +4,52 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { TableName, TableTypes } from '@/types/supabase';
 
-interface UseAdminFormProps<T, F> {
+interface UseAdminFormProps<F> {
   tableName: TableName;
   initialFormState: F;
-  itemToFormData: (item: T) => F;
-  onSuccess: () => void;
+  onSuccess?: () => void;
+  validateForm?: (data: F) => boolean;
 }
 
-export function useAdminForm<T extends { id: string }, F>({
+export function useAdminForm<F extends Record<string, any>>({
   tableName,
   initialFormState,
-  itemToFormData,
-  onSuccess
-}: UseAdminFormProps<T, F>) {
+  onSuccess,
+  validateForm,
+}: UseAdminFormProps<F>) {
   const { toast } = useToast();
   const [formData, setFormData] = useState<F>(initialFormState);
   const [submitting, setSubmitting] = useState(false);
-  
-  // Type assertion to ensure tableName is recognized as a valid table name
-  const tableNameKey = tableName as keyof TableTypes;
   
   const resetForm = () => {
     setFormData(initialFormState);
   };
 
-  const setFormForEditing = (item: T) => {
-    setFormData(itemToFormData(item));
+  const updateFormField = (field: keyof F, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type } = e.target as HTMLInputElement;
+  const handleSubmit = async (editItem: F | null) => {
+    // If a validation function is provided, run it
+    if (validateForm && !validateForm(formData)) {
+      toast({
+        variant: 'destructive',
+        title: 'Validation Error',
+        description: 'Please check your inputs and try again.'
+      });
+      return false;
+    }
     
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' 
-        ? (e.target as HTMLInputElement).checked 
-        : type === 'number'
-          ? parseFloat(value) || 0
-          : value
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent, editItem: T | null) => {
-    e.preventDefault();
     setSubmitting(true);
     
     try {
       if (editItem) {
         // Update existing item
         const { error } = await supabase
-          .from(tableNameKey)
+          .from(tableName)
           .update(formData as any)
           .eq('id', editItem.id);
           
@@ -63,31 +57,33 @@ export function useAdminForm<T extends { id: string }, F>({
         
         toast({
           title: 'Item updated',
-          description: `Item has been updated successfully.`
+          description: 'Your item has been updated successfully.'
         });
       } else {
         // Create new item
         const { error } = await supabase
-          .from(tableNameKey)
+          .from(tableName)
           .insert(formData as any);
           
         if (error) throw error;
         
         toast({
           title: 'Item created',
-          description: `Item has been created successfully.`
+          description: 'Your new item has been created successfully.'
         });
       }
       
       resetForm();
-      onSuccess();
+      if (onSuccess) onSuccess();
+      return true;
     } catch (error) {
-      console.error(`Error saving ${tableName}:`, error);
+      console.error(`Error ${editItem ? 'updating' : 'creating'} ${tableName}:`, error);
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: `Failed to save item.`
+        description: `Failed to ${editItem ? 'update' : 'create'} item.`
       });
+      return false;
     } finally {
       setSubmitting(false);
     }
@@ -95,11 +91,9 @@ export function useAdminForm<T extends { id: string }, F>({
 
   return {
     formData,
-    setFormData,
+    updateFormField,
     resetForm,
-    setFormForEditing,
-    handleInputChange,
-    handleSubmit,
-    submitting
+    submitting,
+    handleSubmit
   };
 }

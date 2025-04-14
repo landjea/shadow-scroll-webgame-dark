@@ -16,14 +16,11 @@ export function useAdminTable<T>({ tableName, queryKey, orderByField = 'created_
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editItem, setEditItem] = useState<T | null>(null);
   
-  // Type assertion to ensure tableName is recognized as a valid table name
-  const tableNameKey = tableName as keyof TableTypes;
-  
   const { data: items, isLoading, refetch } = useQuery({
     queryKey: [queryKey],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from(tableNameKey)
+        .from(tableName)
         .select('*')
         .order(orderByField);
         
@@ -37,7 +34,7 @@ export function useAdminTable<T>({ tableName, queryKey, orderByField = 'created_
     
     try {
       const { error } = await supabase
-        .from(tableNameKey)
+        .from(tableName)
         .delete()
         .eq('id', id);
         
