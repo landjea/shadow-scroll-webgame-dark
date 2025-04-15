@@ -85,7 +85,7 @@ export function useAdminForm<F extends Record<string, any>>({
       if (editItem) {
         // Update existing item
         const { error } = await supabase
-          .from(tableName)
+          .from(tableName as string)
           .update(formData as any)
           .eq('id', editItem.id);
           
@@ -98,7 +98,7 @@ export function useAdminForm<F extends Record<string, any>>({
       } else {
         // Create new item
         const { error } = await supabase
-          .from(tableName)
+          .from(tableName as string)
           .insert(formData as any);
           
         if (error) throw error;

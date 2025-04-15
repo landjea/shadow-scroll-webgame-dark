@@ -8,7 +8,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
 import NotFound from '@/pages/NotFound';
-import { RequireAuth } from '@/components/RequireAuth';
+import RequireAuth from '@/components/RequireAuth';
 import Admin from '@/pages/Admin';
 import CharacterStats from '@/pages/CharacterStats';
 import Characters from '@/pages/admin/Characters';
