@@ -34,7 +34,13 @@ export function useAdminForm<F extends Record<string, any>>({
     }));
   };
 
+<<<<<<< HEAD
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+=======
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+>>>>>>> parent of 2172bce (Fix: Build errors)
     const { name, value, type } = e.target as HTMLInputElement;
     
     if (type === 'checkbox') {

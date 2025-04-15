@@ -3,6 +3,7 @@
 import { Database } from '@/types/database';
 
 // Define known table names as a union type
+<<<<<<< HEAD
 export type TableName = 
   | 'characters' 
   | 'character_stats' 
@@ -35,3 +36,6 @@ export function isValidTableName(name: string): name is TableName {
           'inventory_items', 'map_locations', 'missions', 'stories', 
           'user_roles', 'abilities'].includes(name);
 }
+=======
+export type TableName = keyof Database['public']['Tables'];
+>>>>>>> parent of 2172bce (Fix: Build errors)
