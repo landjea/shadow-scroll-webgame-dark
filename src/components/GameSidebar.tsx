@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { User, Shield, Zap, Award, Star, Flame, BookOpen, ChevronRight, Activity, Settings, Package, Map } from "lucide-react";
+import { User, Shield, Zap, Award, Star, Flame, BookOpen, ChevronRight, Activity, Settings } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -129,38 +129,6 @@ const GameSidebar: React.FC<GameSidebarProps> = ({ heroSpeed, characterStats }) 
               </button>
             </li>
           ))}
-          
-          {/* Admin Popover */}
-          <li>
-            <Popover>
-              <PopoverTrigger asChild>
-                <button className={`w-full text-left px-3 py-2 rounded flex items-center justify-between hover:bg-purple-900 hover:text-purple-200 transition-colors ${location.pathname === '/admin' ? "bg-purple-900 text-purple-200" : "text-purple-400"}`}>
-                  <div className="flex items-center space-x-3">
-                    <span><Settings size={18} /></span>
-                    <span className="font-mono text-sm">Admin</span>
-                  </div>
-                  <ChevronRight size={16} className="text-purple-400" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-64 p-0 bg-purple-900 border border-purple-800" align="end" side="right">
-                <div className="p-3 bg-purple-950 border-b border-purple-900/80">
-                  <h3 className="font-semibold text-purple-300 text-sm">ADMIN OPTIONS</h3>
-                </div>
-                <div className="p-2">
-                  {adminOptions.map((option) => (
-                    <button 
-                      key={option.name}
-                      className="w-full text-left px-3 py-2 rounded flex items-center space-x-3 hover:bg-purple-800 text-purple-300 transition-colors"
-                      onClick={() => handleNavigation('/admin')}
-                    >
-                      <span>{option.icon}</span>
-                      <span className="text-sm">{option.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-          </li>
         </ul>
       </nav>
       
