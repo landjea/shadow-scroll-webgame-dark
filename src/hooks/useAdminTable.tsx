@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { TableName } from '@/types/supabase';
+import { TableName, isValidTableName } from '@/types/supabase';
 
 interface UseAdminTableProps {
   tableName: TableName;
@@ -19,8 +19,13 @@ export function useAdminTable<T>({ tableName, queryKey, orderByField = 'created_
   const { data: items, isLoading, refetch } = useQuery({
     queryKey: [queryKey],
     queryFn: async () => {
+      // Validate the table name for type safety
+      if (!isValidTableName(tableName)) {
+        throw new Error(`Invalid table name: ${tableName}`);
+      }
+      
       const { data, error } = await supabase
-        .from(tableName as string)
+        .from(tableName)
         .select('*')
         .order(orderByField);
         
@@ -33,8 +38,13 @@ export function useAdminTable<T>({ tableName, queryKey, orderByField = 'created_
     if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
     
     try {
+      // Validate the table name for type safety
+      if (!isValidTableName(tableName)) {
+        throw new Error(`Invalid table name: ${tableName}`);
+      }
+      
       const { error } = await supabase
-        .from(tableName as string)
+        .from(tableName)
         .delete()
         .eq('id', id);
         

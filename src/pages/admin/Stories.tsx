@@ -1,233 +1,209 @@
 
-import React, { useState } from 'react';
-import { BookOpen } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React from 'react';
+import { PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Story } from '@/types/admin';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useAdminTable } from '@/hooks/useAdminTable';
 import { useAdminForm } from '@/hooks/useAdminForm';
 import AdminLayout from '@/components/admin/AdminLayout';
-import AdminHeader from '@/components/admin/AdminHeader';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import LoadingState from '@/components/admin/LoadingState';
-import AdminStatus from '@/components/admin/AdminStatus';
+import FormField from '@/components/admin/FormField';
+import TextareaField from '@/components/admin/TextareaField';
+import CheckboxField from '@/components/admin/CheckboxField';
+import DialogFooter from '@/components/admin/DialogFooter';
 import AdminItemActions from '@/components/admin/AdminItemActions';
-import AdminDialogFooter from '@/components/admin/DialogFooter';
+import AdminStatus from '@/components/admin/AdminStatus';
 
-const initialFormState = {
-  title: '',
-  content: '',
-  sequence: 1,
-  is_published: false,
-  requirements: ''
-};
+// Define the story interface
+interface Story {
+  id: string;
+  title: string;
+  content: string;
+  sequence: number;
+  is_published: boolean;
+  requirements: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Story form data type (without id and timestamps)
+type StoryFormData = Omit<Story, 'id' | 'created_at' | 'updated_at'>;
 
 const StoriesAdmin: React.FC = () => {
-  const { toast } = useToast();
-  const [editStory, setEditStory] = useState<Story | null>(null);
-  
   const {
     items: stories,
     isLoading,
     dialogOpen,
     setDialogOpen,
-    openAddDialog,
-    openEditDialog,
-    closeDialog,
+    editItem,
+    refetch,
     handleDelete,
-    refetch
+    openAddDialog,
+    closeDialog
   } = useAdminTable<Story>({
     tableName: 'stories',
     queryKey: 'stories',
     orderByField: 'sequence'
   });
-
+  
   const {
     formData,
     handleInputChange,
-    handleSubmit,
     resetForm,
-    setFormForEditing,
-    submitting
-  } = useAdminForm<Story, typeof initialFormState>({
+    submitting,
+    handleSubmit,
+    setFormForEditing
+  } = useAdminForm<StoryFormData>({
     tableName: 'stories',
-    initialFormState,
-    itemToFormData: (story) => ({
-      title: story.title,
-      content: story.content,
-      sequence: story.sequence,
-      is_published: story.is_published,
-      requirements: story.requirements || ''
-    }),
+    initialFormState: {
+      title: '',
+      content: '',
+      sequence: 1,
+      is_published: false,
+      requirements: null
+    },
     onSuccess: () => {
-      setDialogOpen(false);
-      setEditStory(null);
+      closeDialog();
       refetch();
     }
   });
-
-  const handleOpenEditDialog = (story: Story) => {
-    setEditStory(story);
+  
+  const handleEdit = (story: Story) => {
     setFormForEditing(story);
     setDialogOpen(true);
   };
 
   return (
-    <AdminLayout>
-      <AdminHeader
-        title="Story Management"
-        description="Create and manage game storylines"
-        onAddNew={openAddDialog}
-        addButtonText="Add Story"
-      />
-
+    <AdminLayout
+      title="Story Management"
+      description="Manage your game's storyline and narrative content."
+      action={
+        <Button onClick={openAddDialog} className="flex items-center gap-2">
+          <PlusCircle className="h-4 w-4" />
+          Add Story
+        </Button>
+      }
+    >
       {isLoading ? (
         <LoadingState />
-      ) : stories?.length === 0 ? (
+      ) : !stories || stories.length === 0 ? (
         <AdminEmptyState
-          icon={BookOpen}
           title="No stories found"
-          description="Start by adding some story chapters to your game."
-          onAddNew={openAddDialog}
-          addButtonText="Add First Story Chapter"
+          description="You haven't created any story content yet. Get started by adding a new story."
+          buttonText="Add Story"
+          buttonIcon={<PlusCircle className="h-4 w-4" />}
+          onButtonClick={openAddDialog}
         />
       ) : (
-        <Table>
-          <TableCaption>A list of all story chapters in the game.</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Sequence</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Requirements</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {stories?.map((story) => (
-              <TableRow key={story.id}>
-                <TableCell>{story.sequence}</TableCell>
-                <TableCell className="font-medium">{story.title}</TableCell>
-                <TableCell>{story.requirements || 'None'}</TableCell>
-                <TableCell>
-                  <AdminStatus 
-                    value={story.is_published}
-                    activeText="Published"
-                    inactiveText="Draft"
-                  />
-                </TableCell>
-                <TableCell className="text-right">
-                  <AdminItemActions
-                    onEdit={() => handleOpenEditDialog(story)}
-                    onDelete={() => handleDelete(story.id, story.title)}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="rounded-md border">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="p-3 text-left text-sm font-medium">Title</th>
+                  <th className="p-3 text-left text-sm font-medium">Sequence</th>
+                  <th className="p-3 text-left text-sm font-medium">Status</th>
+                  <th className="p-3 text-left text-sm font-medium">Requirements</th>
+                  <th className="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stories.map((story) => (
+                  <tr key={story.id} className="border-b">
+                    <td className="p-3">
+                      <div className="font-medium">{story.title}</div>
+                      <div className="text-xs text-muted-foreground line-clamp-1 max-w-xs">
+                        {story.content}
+                      </div>
+                    </td>
+                    <td className="p-3">{story.sequence}</td>
+                    <td className="p-3">
+                      <AdminStatus 
+                        isActive={story.is_published} 
+                        activeText="Published" 
+                        inactiveText="Draft" 
+                      />
+                    </td>
+                    <td className="p-3 text-sm text-muted-foreground">
+                      {story.requirements || 'None'}
+                    </td>
+                    <td className="p-3 text-right">
+                      <AdminItemActions
+                        onEdit={() => handleEdit(story)}
+                        onDelete={() => handleDelete(story.id, story.title)}
+                        compact
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{editStory ? 'Edit Story' : 'Add New Story'}</DialogTitle>
-            <DialogDescription>
-              {editStory 
-                ? `Make changes to ${editStory.title}.` 
-                : 'Fill out the form below to create a new story chapter.'}
-            </DialogDescription>
+            <DialogTitle>
+              {editItem ? `Edit ${editItem.title}` : 'Add New Story'}
+            </DialogTitle>
           </DialogHeader>
-          <form onSubmit={(e) => handleSubmit(e, editStory)}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="title" className="text-right">Title</Label>
-                <Input 
-                  id="title" 
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  className="col-span-3" 
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-4 items-start gap-4">
-                <Label htmlFor="content" className="text-right pt-2">Content</Label>
-                <Textarea 
-                  id="content" 
-                  name="content"
-                  value={formData.content}
-                  onChange={handleInputChange}
-                  className="col-span-3 min-h-32" 
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="sequence" className="text-right">Sequence</Label>
-                <Input 
-                  id="sequence" 
+          
+          <form onSubmit={(e) => handleSubmit(e, editItem)}>
+            <div className="space-y-4 py-2">
+              <FormField
+                label="Story Title"
+                name="title"
+                placeholder="e.g., Origin of the Hero"
+                value={formData.title}
+                onChange={handleInputChange}
+                required
+              />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  label="Sequence Number"
                   name="sequence"
                   type="number"
-                  min={1}
-                  value={formData.sequence}
+                  value={formData.sequence.toString()}
                   onChange={handleInputChange}
-                  className="col-span-3" 
                   required
                 />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="requirements" className="text-right">Requirements</Label>
-                <Input 
-                  id="requirements" 
-                  name="requirements"
-                  value={formData.requirements}
+                
+                <CheckboxField
+                  label="Published"
+                  name="is_published"
+                  checked={formData.is_published}
                   onChange={handleInputChange}
-                  className="col-span-3" 
-                  placeholder="Optional requirements to unlock (e.g., level, mission)"
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="is_published" className="text-right">Published</Label>
-                <div className="col-span-3">
-                  <Input 
-                    id="is_published" 
-                    name="is_published"
-                    type="checkbox"
-                    checked={formData.is_published}
-                    onChange={handleInputChange}
-                    className="h-4 w-4"
-                  />
-                  <Label htmlFor="is_published" className="ml-2">
-                    Story is currently published
-                  </Label>
-                </div>
-              </div>
+              
+              <TextareaField
+                label="Story Content"
+                name="content"
+                placeholder="Write your story content here..."
+                value={formData.content}
+                onChange={handleInputChange}
+                rows={8}
+                required
+              />
+              
+              <TextareaField
+                label="Requirements (optional)"
+                name="requirements"
+                placeholder="e.g., Complete Mission 'City in Danger'"
+                value={formData.requirements || ''}
+                onChange={handleInputChange}
+              />
             </div>
-            <AdminDialogFooter
+            
+            <DialogFooter
               onCancel={() => {
                 closeDialog();
                 resetForm();
               }}
-              isEditing={!!editStory}
               isSubmitting={submitting}
             />
           </form>

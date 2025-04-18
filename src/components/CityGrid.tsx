@@ -48,8 +48,14 @@ const CityGrid: React.FC<CityGridProps> = ({
   const radius = Math.floor(gridSize / 2); // How far the grid extends from center (3 in each direction)
 
   useEffect(() => {
+    // Add safety checks to prevent undefined errors
+    if (!grid || !Array.isArray(grid) || grid.length === 0) {
+      console.error('Invalid grid:', grid);
+      return;
+    }
+    
     // Ensure we have a valid currentLocation before proceeding
-    if (!currentLocation || typeof currentLocation.x === 'undefined' || typeof currentLocation.y === 'undefined') {
+    if (!currentLocation || typeof currentLocation.x !== 'number' || typeof currentLocation.y !== 'number') {
       console.error('Invalid currentLocation:', currentLocation);
       return;
     }
@@ -120,7 +126,7 @@ const CityGrid: React.FC<CityGridProps> = ({
     return distance <= heroSpeed && distance <= heroStamina;
   };
 
-  if (!currentLocation || !grid || grid.length === 0) {
+  if (!currentLocation || !grid || grid.length === 0 || centeredGrid.length === 0) {
     return <div className="p-4 text-center">Loading map...</div>;
   }
 

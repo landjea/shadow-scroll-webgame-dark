@@ -23,7 +23,8 @@ const Game: React.FC = () => {
     heroSpeed,
     gameActions,
     handleAction,
-    handleLocationSelect
+    handleLocationSelect,
+    characterStats
   } = useGameState();
   
   useEffect(() => {
@@ -39,6 +40,16 @@ const Game: React.FC = () => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, [isMobile, isOpen]);
 
+  // Add some console logging to help debug issues
+  useEffect(() => {
+    console.log("Game component rendered with:", { 
+      cityGridExists: !!cityGrid, 
+      currentLocationExists: !!currentLocation,
+      cityGridSize: cityGrid ? `${cityGrid.length}x${cityGrid[0]?.length}` : 'N/A',
+      currentLocation: currentLocation ? `(${currentLocation.x},${currentLocation.y})` : 'N/A'
+    });
+  }, [cityGrid, currentLocation]);
+
   return (
     <div className="h-screen overflow-hidden flex flex-col text-neutral-50">
       {/* Game header with stats and controls */}
@@ -52,13 +63,13 @@ const Game: React.FC = () => {
         {/* Sidebar for inventory, abilities, etc */}
         <GameSidebar 
           heroSpeed={heroSpeed} 
-          characterStats={undefined}
+          characterStats={characterStats}
         />
         
         {/* Main game grid area */}
         <main className={`flex-1 ${isOpen && isMobile ? 'hidden' : 'flex flex-col'} overflow-hidden`}>
           <div className="flex-1 overflow-hidden relative">
-            {cityGrid && currentLocation && (
+            {cityGrid && currentLocation ? (
               <CityGrid 
                 grid={cityGrid}
                 currentLocation={currentLocation}
@@ -66,6 +77,10 @@ const Game: React.FC = () => {
                 heroStamina={heroEnergy}
                 onLocationSelect={handleLocationSelect}
               />
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <p className="text-lg">Loading game map...</p>
+              </div>
             )}
             
             {/* Game log console (fixed at bottom) */}

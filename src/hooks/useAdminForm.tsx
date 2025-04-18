@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { TableName } from '@/types/supabase';
+import { TableName, isValidTableName } from '@/types/supabase';
 
 interface UseAdminFormProps<F> {
   tableName: TableName;
@@ -34,13 +34,9 @@ export function useAdminForm<F extends Record<string, any>>({
     }));
   };
 
-<<<<<<< HEAD
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-=======
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
->>>>>>> parent of 2172bce (Fix: Build errors)
     const { name, value, type } = e.target as HTMLInputElement;
     
     if (type === 'checkbox') {
@@ -79,13 +75,23 @@ export function useAdminForm<F extends Record<string, any>>({
       return false;
     }
     
+    // Validate the table name for type safety
+    if (!isValidTableName(tableName)) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: `Invalid table name: ${tableName}`
+      });
+      return false;
+    }
+    
     setSubmitting(true);
     
     try {
       if (editItem) {
         // Update existing item
         const { error } = await supabase
-          .from(tableName as string)
+          .from(tableName)
           .update(formData as any)
           .eq('id', editItem.id);
           
@@ -98,7 +104,7 @@ export function useAdminForm<F extends Record<string, any>>({
       } else {
         // Create new item
         const { error } = await supabase
-          .from(tableName as string)
+          .from(tableName)
           .insert(formData as any);
           
         if (error) throw error;

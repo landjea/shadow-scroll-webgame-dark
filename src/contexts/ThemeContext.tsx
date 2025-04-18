@@ -18,34 +18,53 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   });
 
   useEffect(() => {
-    // Remove previous theme classes and add the new one to both html and body
-    document.documentElement.classList.remove('theme-starfire', 'theme-batman', 'theme-superman');
-    document.documentElement.classList.add(`theme-${theme}`);
+    // Function to apply theme styles
+    const applyThemeStyles = () => {
+      // Remove previous theme classes
+      document.documentElement.classList.remove('theme-starfire', 'theme-batman', 'theme-superman');
+      document.body.classList.remove('theme-starfire', 'theme-batman', 'theme-superman');
+      
+      // Add new theme classes
+      document.documentElement.classList.add(`theme-${theme}`);
+      document.body.classList.add(`theme-${theme}`);
+      
+      // Apply theme colors directly to body and html element
+      let bgColor = '#2D1B69';
+      let textColor = '#F8F9FA';
+      
+      if (theme === 'batman') {
+        bgColor = '#1A1A1A';
+        textColor = '#E6E6E6';
+      } else if (theme === 'superman') {
+        bgColor = '#0A3161';
+        textColor = '#F8F9FA';
+      }
+      
+      // Apply direct styles for immediate visual feedback
+      document.documentElement.style.backgroundColor = bgColor;
+      document.documentElement.style.color = textColor;
+      document.body.style.backgroundColor = bgColor;
+      document.body.style.color = textColor;
+      
+      // Forcefully set the game background colors
+      const gameElements = document.querySelectorAll('.game-panel, .game-sidebar');
+      gameElements.forEach(element => {
+        (element as HTMLElement).style.backgroundColor = theme === 'batman' ? '#1A1A1A' : 
+          theme === 'superman' ? '#0A3161' : '#2D1B69';
+      });
+      
+      // Save the theme preference to localStorage
+      localStorage.setItem('theme', theme);
+      
+      console.log(`Theme applied: ${theme} - Background: ${bgColor}, Text: ${textColor}`);
+    };
+
+    // Apply the theme immediately
+    applyThemeStyles();
     
-    document.body.classList.remove('theme-starfire', 'theme-batman', 'theme-superman');
-    document.body.classList.add(`theme-${theme}`);
-    
-    // Apply theme colors directly to body
-    let bgColor = '#2D1B69';
-    let textColor = '#F8F9FA';
-    
-    if (theme === 'batman') {
-      bgColor = '#1A1A1A';
-      textColor = '#E6E6E6';
-    } else if (theme === 'superman') {
-      bgColor = '#0A3161';
-      textColor = '#F8F9FA';
-    }
-    
-    // Apply styles directly
-    document.body.style.backgroundColor = bgColor;
-    document.body.style.color = textColor;
-    
-    // Save the theme preference to localStorage
-    localStorage.setItem('theme', theme);
-    
-    // Log to verify theme change is happening
-    console.log(`Theme changed to: ${theme} - Background: ${bgColor}, Text: ${textColor}`);
+    // Also set up a small delay to ensure the theme is applied after any React rendering
+    const timeoutId = setTimeout(applyThemeStyles, 50);
+    return () => clearTimeout(timeoutId);
   }, [theme]);
 
   const contextValue = {

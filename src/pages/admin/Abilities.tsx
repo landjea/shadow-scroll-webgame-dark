@@ -1,110 +1,109 @@
 
 import React, { useState } from 'react';
-import { Zap } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useAdminTable } from '@/hooks/useAdminTable';
-import { useAdminForm } from '@/hooks/useAdminForm';
-import { Ability } from '@/types/admin';
-import AdminLayout from '@/components/admin/AdminLayout';
-import AdminHeader from '@/components/admin/AdminHeader';
-import AdminEmptyState from '@/components/admin/AdminEmptyState';
-import LoadingState from '@/components/admin/LoadingState';
 import AbilitiesTable from '@/components/admin/abilities/AbilitiesTable';
 import AbilityForm from '@/components/admin/abilities/AbilityForm';
+import AdminLayout from '@/components/admin/AdminLayout';
+import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import LoadingState from '@/components/admin/LoadingState';
 
-const initialFormState = {
-  name: '',
-  description: '',
-  type: 'offensive',
-  energy_cost: 10,
-  cooldown: 0,
-  is_active: true
-};
+// Define the Ability type
+export interface Ability {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  energy_cost: number;
+  cooldown: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
 
-const AbilitiesAdmin: React.FC = () => {
-  const [editAbility, setEditAbility] = React.useState<Ability | null>(null);
-  
+const Abilities: React.FC = () => {
   const {
     items: abilities,
     isLoading,
     dialogOpen,
     setDialogOpen,
-    openAddDialog,
+    editItem,
+    refetch,
     handleDelete,
-    refetch
+    openAddDialog,
+    closeDialog
   } = useAdminTable<Ability>({
     tableName: 'abilities',
     queryKey: 'abilities',
     orderByField: 'name'
   });
-
-  const {
-    formData,
-    handleInputChange,
-    handleSubmit,
-    resetForm,
-    setFormForEditing,
-    submitting
-  } = useAdminForm<Ability>({
-    tableName: 'abilities',
-    initialFormState,
-    onSuccess: () => {
-      setDialogOpen(false);
-      setEditAbility(null);
-      refetch();
-    }
-  });
-
-  const handleOpenEditDialog = (ability: Ability) => {
-    setEditAbility(ability);
-    setFormForEditing(ability);
-    setDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
-    setEditAbility(null);
-    resetForm();
+  
+  const initialFormState: Omit<Ability, 'id' | 'created_at' | 'updated_at'> & { id?: string } = {
+    name: '',
+    description: '',
+    type: 'attack',
+    energy_cost: 10,
+    cooldown: 0,
+    is_active: true
   };
 
   return (
-    <AdminLayout>
-      <AdminHeader
-        title="Ability Management"
-        description="Create and manage superhero abilities"
-        onAddNew={openAddDialog}
-        addButtonText="Add Ability"
-      />
-
+    <AdminLayout
+      title="Hero Abilities"
+      description="Manage the special abilities that heroes can use in the game."
+      action={
+        <Button onClick={openAddDialog} className="flex items-center gap-2">
+          <PlusCircle className="h-4 w-4" />
+          Add Ability
+        </Button>
+      }
+    >
       {isLoading ? (
         <LoadingState />
-      ) : abilities?.length === 0 ? (
+      ) : !abilities || abilities.length === 0 ? (
         <AdminEmptyState
-          icon={Zap}
           title="No abilities found"
-          description="Start by adding some abilities to your game."
-          onAddNew={openAddDialog}
-          addButtonText="Add First Ability"
+          description="You haven't created any abilities yet. Get started by adding a new ability."
+          buttonText="Add Ability"
+          buttonIcon={<PlusCircle className="h-4 w-4" />}
+          onButtonClick={openAddDialog}
         />
       ) : (
-        <AbilitiesTable 
-          abilities={abilities || []}
-          onEdit={handleOpenEditDialog}
+        <AbilitiesTable
+          abilities={abilities}
           onDelete={handleDelete}
+          onEdit={ability => {
+            setDialogOpen(true);
+            // Explicitly cast to Ability to ensure type safety
+            const abilityWithId = ability as Ability;
+            // Now pass the ability with confirmed id
+            if (abilityWithId.id) {
+              openEditDialog(abilityWithId);
+            }
+          }}
         />
       )}
 
-      <AbilityForm
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        editAbility={editAbility}
-        formData={formData}
-        onInputChange={handleInputChange}
-        onSubmit={(e) => handleSubmit(e, editAbility)}
-        onCancel={handleCloseDialog}
-        isSubmitting={submitting}
-      />
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {editItem ? `Edit ${editItem.name}` : 'Add New Ability'}
+            </DialogTitle>
+          </DialogHeader>
+          <AbilityForm
+            ability={editItem}
+            onSuccess={() => {
+              closeDialog();
+              refetch();
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
 
-export default AbilitiesAdmin;
+export default Abilities;
