@@ -97,8 +97,8 @@ const Game: React.FC = () => {
         
         {/* Main game grid area */}
         <main className="flex-1 flex flex-col overflow-hidden">
-          {/* City Grid Container - fixed height to prevent overlap */}
-          <div className="h-[calc(100%-180px)] overflow-auto">
+          {/* City Grid Container - now with a percentage-based height */}
+          <div className="h-[60%] overflow-auto">
             {cityGrid && currentLocation ? (
               <CityGrid 
                 grid={cityGrid}
@@ -114,15 +114,17 @@ const Game: React.FC = () => {
             )}
           </div>
           
-          {/* Game actions and log - now as a separate section below the grid */}
-          <div className={`h-[180px] ${styles.bg} ${styles.borderColor} border-t`}>
-            <div className="p-4 flex flex-col h-full overflow-hidden">
-              <GameAvailableActions 
-                actions={gameActions} 
-                onAction={handleAction} 
-                heroEnergy={heroEnergy}
-              />
-              <div className="mt-2 overflow-auto">
+          {/* Game actions and log - now with a percentage-based height and scrolling */}
+          <div className={`h-[40%] ${styles.bg} ${styles.borderColor} border-t overflow-y-auto`}>
+            <div className="p-4 flex flex-col h-full">
+              <div className="mb-4">
+                <GameAvailableActions 
+                  actions={gameActions} 
+                  onAction={handleAction} 
+                  heroEnergy={heroEnergy}
+                />
+              </div>
+              <div className="flex-1 overflow-y-auto">
                 <GameActionLog entries={actionLog} />
               </div>
             </div>
