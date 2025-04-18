@@ -1,3 +1,4 @@
+
 export interface InventoryItem {
   id: string;
   name: string;
@@ -67,7 +68,9 @@ export interface Ability {
   id: string;
   name: string;
   description: string;
-  effect: string;
+  type: string;         // Add type property
+  energy_cost: number;  // Add energy_cost property
+  effect?: string;      // Make effect optional
   power_level: number;
   cooldown: number;
   is_active: boolean;

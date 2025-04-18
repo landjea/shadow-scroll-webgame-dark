@@ -24,7 +24,9 @@ export function useAdminTable<T>({ tableName, queryKey, orderByField = 'created_
         throw new Error(`Invalid table name: ${tableName}`);
       }
       
-      const { data, error } = await supabase
+      // Explicitly cast to 'any' to bypass TypeScript restrictions
+      // This is safe because we've validated the table name
+      const { data, error } = await (supabase as any)
         .from(tableName)
         .select('*')
         .order(orderByField);
@@ -43,7 +45,8 @@ export function useAdminTable<T>({ tableName, queryKey, orderByField = 'created_
         throw new Error(`Invalid table name: ${tableName}`);
       }
       
-      const { error } = await supabase
+      // Explicitly cast to 'any' to bypass TypeScript restrictions
+      const { error } = await (supabase as any)
         .from(tableName)
         .delete()
         .eq('id', id);

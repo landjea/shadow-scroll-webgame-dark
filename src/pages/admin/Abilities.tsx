@@ -9,19 +9,7 @@ import AbilityForm from '@/components/admin/abilities/AbilityForm';
 import AdminLayout from '@/components/admin/AdminLayout';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import LoadingState from '@/components/admin/LoadingState';
-
-// Define the Ability type
-export interface Ability {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  energy_cost: number;
-  cooldown: number;
-  is_active: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
+import { Ability } from '@/types/admin';
 
 const Abilities: React.FC = () => {
   const {
@@ -33,21 +21,13 @@ const Abilities: React.FC = () => {
     refetch,
     handleDelete,
     openAddDialog,
-    closeDialog
+    closeDialog,
+    setEditItem
   } = useAdminTable<Ability>({
     tableName: 'abilities',
     queryKey: 'abilities',
     orderByField: 'name'
   });
-  
-  const initialFormState: Omit<Ability, 'id' | 'created_at' | 'updated_at'> & { id?: string } = {
-    name: '',
-    description: '',
-    type: 'attack',
-    energy_cost: 10,
-    cooldown: 0,
-    is_active: true
-  };
 
   return (
     <AdminLayout
@@ -66,22 +46,17 @@ const Abilities: React.FC = () => {
         <AdminEmptyState
           title="No abilities found"
           description="You haven't created any abilities yet. Get started by adding a new ability."
-          buttonText="Add Ability"
+          addButtonText="Add Ability"
           buttonIcon={<PlusCircle className="h-4 w-4" />}
-          onButtonClick={openAddDialog}
+          onAddNew={openAddDialog}
         />
       ) : (
         <AbilitiesTable
           abilities={abilities}
           onDelete={handleDelete}
-          onEdit={ability => {
+          onEdit={(ability) => {
+            setEditItem(ability);
             setDialogOpen(true);
-            // Explicitly cast to Ability to ensure type safety
-            const abilityWithId = ability as Ability;
-            // Now pass the ability with confirmed id
-            if (abilityWithId.id) {
-              openEditDialog(abilityWithId);
-            }
           }}
         />
       )}

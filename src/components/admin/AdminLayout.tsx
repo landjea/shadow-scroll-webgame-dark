@@ -7,9 +7,17 @@ import AdminSidebar from './AdminSidebar';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
+  title?: string;
+  description?: string;
+  action?: React.ReactNode;
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
+const AdminLayout: React.FC<AdminLayoutProps> = ({ 
+  children, 
+  title, 
+  description, 
+  action 
+}) => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
   
@@ -29,12 +37,23 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       <AdminSidebar />
       <main className="flex-1 p-6 overflow-y-auto">
         <div className="flex justify-end mb-4">
           <ThemeSelector />
         </div>
+        
+        {(title || description) && (
+          <header className="mb-6 flex justify-between items-center">
+            <div>
+              {title && <h1 className="text-3xl font-bold text-purple-800 dark:text-purple-400">{title}</h1>}
+              {description && <p className="text-gray-600 dark:text-gray-400">{description}</p>}
+            </div>
+            {action && <div>{action}</div>}
+          </header>
+        )}
+        
         {children}
       </main>
     </div>
