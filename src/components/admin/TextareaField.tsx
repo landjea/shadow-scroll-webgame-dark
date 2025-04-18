@@ -11,6 +11,8 @@ interface TextareaFieldProps {
   required?: boolean;
   placeholder?: string;
   className?: string;
+  name?: string; // Add name property
+  rows?: number; // Add rows property
 }
 
 const TextareaField: React.FC<TextareaFieldProps> = ({
@@ -20,19 +22,22 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
   onChange,
   required = false,
   placeholder = '',
-  className = ''
+  className = '',
+  name,
+  rows
 }) => {
   return (
     <div className="grid grid-cols-4 items-start gap-4">
       <Label htmlFor={id} className="text-right pt-2">{label}</Label>
       <Textarea 
         id={id} 
-        name={id}
+        name={name || id}
         value={value}
         onChange={onChange}
         className={`col-span-3 ${className}`} 
         required={required}
         placeholder={placeholder}
+        rows={rows}
       />
     </div>
   );

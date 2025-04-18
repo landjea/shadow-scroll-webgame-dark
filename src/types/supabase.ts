@@ -1,4 +1,3 @@
-
 // This file helps type-safe Supabase table operations
 import { Database } from '@/types/database';
 import { Ability, UserRole } from '@/types/admin';
@@ -32,7 +31,16 @@ export type TableTypes = {
 
 // Type guard to check if a string is a valid TableName
 export function isValidTableName(name: string): name is TableName {
-  return ['characters', 'character_stats', 'game_actions', 'game_saves', 
-          'inventory_items', 'map_locations', 'missions', 'stories', 
-          'user_roles', 'abilities'].includes(name);
+  return [
+    'characters',
+    'character_stats',
+    'game_actions',
+    'game_saves',
+    'inventory_items',
+    'map_locations',
+    'missions',
+    'stories',
+    'user_roles',
+    'abilities',
+  ].includes(name);
 }

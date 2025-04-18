@@ -68,9 +68,9 @@ export interface Ability {
   id: string;
   name: string;
   description: string;
-  type: string;         // Add type property
-  energy_cost: number;  // Add energy_cost property
-  effect?: string;      // Make effect optional
+  type: string;
+  energy_cost: number;
+  effect?: string;
   power_level: number;
   cooldown: number;
   is_active: boolean;

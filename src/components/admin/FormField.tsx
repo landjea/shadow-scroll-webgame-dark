@@ -13,6 +13,7 @@ interface FormFieldProps {
   placeholder?: string;
   min?: number;
   className?: string;
+  name?: string; // Add name property
 }
 
 const FormField: React.FC<FormFieldProps> = ({
@@ -24,14 +25,15 @@ const FormField: React.FC<FormFieldProps> = ({
   required = false,
   placeholder = '',
   min,
-  className = ''
+  className = '',
+  name
 }) => {
   return (
     <div className="grid grid-cols-4 items-center gap-4">
       <Label htmlFor={id} className="text-right">{label}</Label>
       <Input 
         id={id} 
-        name={id}
+        name={name || id}
         type={type}
         value={type === 'checkbox' ? undefined : value as string | number}
         checked={type === 'checkbox' ? value as boolean : undefined}

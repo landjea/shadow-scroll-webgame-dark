@@ -5,13 +5,13 @@ import { DialogFooter } from '@/components/ui/dialog';
 
 interface AdminDialogFooterProps {
   onCancel: () => void;
-  isEditing: boolean;
+  isEditing?: boolean; // Make isEditing optional
   isSubmitting?: boolean;
 }
 
 const AdminDialogFooter: React.FC<AdminDialogFooterProps> = ({
   onCancel,
-  isEditing,
+  isEditing = false, // Default to false
   isSubmitting = false
 }) => {
   return (

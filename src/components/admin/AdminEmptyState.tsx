@@ -10,7 +10,6 @@ interface AdminEmptyStateProps {
   buttonIcon?: React.ReactNode;
   onAddNew: () => void;
   // For backward compatibility:
-  icon?: React.ElementType;
   buttonText?: string; 
   onButtonClick?: () => void;
 }
@@ -22,7 +21,6 @@ const AdminEmptyState: React.FC<AdminEmptyStateProps> = ({
   buttonIcon = <Plus className="mr-2 h-4 w-4" />,
   onAddNew,
   // Handle backward compatibility:
-  icon: Icon,
   buttonText,
   onButtonClick
 }) => {
@@ -32,7 +30,6 @@ const AdminEmptyState: React.FC<AdminEmptyStateProps> = ({
   
   return (
     <div className="text-center my-12 p-8 border border-dashed rounded-lg">
-      {Icon && <Icon className="mx-auto h-12 w-12 text-gray-400 mb-4" />}
       <h3 className="text-lg font-medium mb-2">{title}</h3>
       <p className="text-gray-600 mb-4">{description}</p>
       <Button 

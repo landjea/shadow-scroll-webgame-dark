@@ -9,6 +9,7 @@ interface CheckboxFieldProps {
   checked: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   description: string;
+  name?: string; // Add name property
 }
 
 const CheckboxField: React.FC<CheckboxFieldProps> = ({
@@ -16,7 +17,8 @@ const CheckboxField: React.FC<CheckboxFieldProps> = ({
   label,
   checked,
   onChange,
-  description
+  description,
+  name
 }) => {
   return (
     <div className="grid grid-cols-4 items-center gap-4">
@@ -24,7 +26,7 @@ const CheckboxField: React.FC<CheckboxFieldProps> = ({
       <div className="col-span-3">
         <Input 
           id={id} 
-          name={id}
+          name={name || id}
           type="checkbox"
           checked={checked}
           onChange={onChange}
