@@ -1,6 +1,7 @@
 
 // This file helps type-safe Supabase table operations
 import { Database } from '@/types/database';
+import { Ability, UserRole } from '@/types/admin';
 
 // Define known table names as a union type
 export type TableName = 
@@ -25,8 +26,8 @@ export type TableTypes = {
   map_locations: Database['public']['Tables']['map_locations']['Row'];
   missions: Database['public']['Tables']['missions']['Row'];
   stories: Database['public']['Tables']['stories']['Row'];
-  user_roles: Database['public']['Tables']['user_roles']['Row'];
-  abilities: any; // Temporary solution until proper type is available
+  user_roles: UserRole;
+  abilities: Ability;
 }
 
 // Type guard to check if a string is a valid TableName

@@ -1,4 +1,3 @@
-
 export interface InventoryItem {
   id: string;
   name: string;
@@ -54,4 +53,23 @@ export interface Location {
   is_unlocked: boolean;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface UserRole {
+  id: string;
+  user_id: string;
+  role: 'admin' | 'player';
+  user_email?: string;
+  created_at?: string;
+}
+
+export interface Ability {
+  id: string;
+  name: string;
+  description: string;
+  effect: string;
+  power_level: number;
+  cooldown: number;
+  is_active: boolean;
+  created_at?: string;
 }

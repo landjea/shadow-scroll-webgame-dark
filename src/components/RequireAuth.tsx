@@ -31,3 +31,5 @@ export const RequireAuth: React.FC<RequireAuthProps> = ({ children, adminOnly = 
 
   return <>{children}</>;
 };
+
+export default RequireAuth; // Add default export alongside named export for backward compatibility
