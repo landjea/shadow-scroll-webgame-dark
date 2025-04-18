@@ -1,31 +1,6 @@
 
 import React, { useState } from 'react';
-<<<<<<< HEAD
 import { Shield } from 'lucide-react';
-=======
-import { Shield, Search, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { UserRole } from '@/types/admin';
-import { supabase } from '@/integrations/supabase/client';
->>>>>>> parent of 2172bce (Fix: Build errors)
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,7 +20,7 @@ const RolesAdmin: React.FC = () => {
   const [editRole, setEditRole] = useState<UserRole | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [userEmail, setUserEmail] = useState('');
-  const [selectedRole, setSelectedRole] = useState<'admin' | 'moderator' | 'player'>('player');
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'player'>('player');
 
   const {
     data: roles,
@@ -208,7 +183,6 @@ const RolesAdmin: React.FC = () => {
           addButtonText="Add First Role"
         />
       ) : (
-<<<<<<< HEAD
         <RolesTable 
           roles={filteredRoles} 
           onDelete={handleDelete} 
@@ -225,92 +199,6 @@ const RolesAdmin: React.FC = () => {
         onSubmit={handleAddRole}
         isSubmitting={submitting}
       />
-=======
-        <Table>
-          <TableCaption>A list of all user roles in the system.</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>User Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredRoles.map((role) => (
-              <TableRow key={role.id}>
-                <TableCell className="font-medium">{role.user_email}</TableCell>
-                <TableCell>
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                    ${role.role === 'admin' ? 'bg-purple-100 text-purple-800' : 
-                     role.role === 'moderator' ? 'bg-blue-100 text-blue-800' : 
-                     'bg-green-100 text-green-800'}`}>
-                    {role.role}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(role.id, role.user_email || '')}
-                  >
-                    <Shield className="h-4 w-4 text-red-500" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add User Role</DialogTitle>
-            <DialogDescription>
-              Assign a role to a user by email address.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleAddRole}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="userEmail" className="text-right">User Email</Label>
-                <Input 
-                  id="userEmail" 
-                  type="email"
-                  value={userEmail}
-                  onChange={(e) => setUserEmail(e.target.value)}
-                  className="col-span-3" 
-                  required
-                  placeholder="user@example.com"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="role" className="text-right">Role</Label>
-                <select
-                  id="role"
-                  value={selectedRole}
-                  onChange={(e) => setSelectedRole(e.target.value as 'admin' | 'moderator' | 'player')}
-                  className="col-span-3 flex h-9 w-full rounded-md border border-input bg-background px-3 py-1"
-                >
-                  <option value="player">Player</option>
-                  <option value="moderator">Moderator</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-            </div>
-            <AdminDialogFooter
-              onCancel={() => {
-                setDialogOpen(false);
-                setUserEmail('');
-                setSelectedRole('player');
-              }}
-              isEditing={false}
-              isSubmitting={submitting}
-            />
-          </form>
-        </DialogContent>
-      </Dialog>
->>>>>>> parent of 2172bce (Fix: Build errors)
     </AdminLayout>
   );
 };
