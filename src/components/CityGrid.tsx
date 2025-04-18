@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { MapPin, Building, Car as RoadIcon, Trees as Park, Shield as PoliceIcon, Hospital as HospitalIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LocationType } from '@/types/game';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface LocationIconProps {
   type: LocationType['type'];
@@ -44,6 +45,7 @@ const CityGrid: React.FC<CityGridProps> = ({
   onLocationSelect,
 }) => {
   const [centeredGrid, setCenteredGrid] = useState<LocationType[][]>([]);
+  const { theme } = useTheme();
   const gridSize = 7; // Total grid size (7x7)
   const radius = Math.floor(gridSize / 2); // How far the grid extends from center (3 in each direction)
 
@@ -126,14 +128,61 @@ const CityGrid: React.FC<CityGridProps> = ({
     return distance <= heroSpeed && distance <= heroStamina;
   };
 
+  // Get theme-specific colors
+  const getThemeColors = () => {
+    switch (theme) {
+      case 'batman':
+        return {
+          gridBg: 'bg-batman-dark',
+          gridBorder: 'border-gray-800',
+          currentBg: 'bg-batman-gold',
+          currentText: 'text-black',
+          reachableBg: 'bg-gray-800',
+          reachableBgHover: 'hover:bg-gray-700',
+          reachableText: 'text-gray-300',
+          reachableIcon: 'text-batman-gold',
+          unreachableBg: 'bg-gray-900/70',
+          unreachableText: 'text-gray-500/50'
+        };
+      case 'superman':
+        return {
+          gridBg: 'bg-superman-blue',
+          gridBorder: 'border-blue-800',
+          currentBg: 'bg-superman-red',
+          currentText: 'text-white',
+          reachableBg: 'bg-blue-900',
+          reachableBgHover: 'hover:bg-blue-800',
+          reachableText: 'text-blue-100',
+          reachableIcon: 'text-superman-red',
+          unreachableBg: 'bg-blue-950/70',
+          unreachableText: 'text-blue-300/50'
+        };
+      case 'starfire':
+      default:
+        return {
+          gridBg: 'bg-[#2F2E33]',
+          gridBorder: 'border-[#2F2E33]',
+          currentBg: 'bg-[#FE5F55]',
+          currentText: 'text-white',
+          reachableBg: 'bg-[#5B3C80]',
+          reachableBgHover: 'hover:bg-[#744C9E]',
+          reachableText: 'text-[#F0EBF4]',
+          reachableIcon: 'text-[#BCD8C1]',
+          unreachableBg: 'bg-[#2F2E33]/70',
+          unreachableText: 'text-[#A3A1A8]/50'
+        };
+    }
+  };
+  
+  const colors = getThemeColors();
+
   if (!currentLocation || !grid || grid.length === 0 || centeredGrid.length === 0) {
     return <div className="p-4 text-center">Loading map...</div>;
   }
 
   return (
-    <div className="grid grid-cols-7 gap-1 p-2 rounded-md border" style={{ background: "#2F2E33", borderColor: "#2F2E33" }}>
+    <div className={`grid grid-cols-7 gap-1 p-2 rounded-md border ${colors.gridBg} ${colors.gridBorder}`}>
       {centeredGrid.map((row, rowIndex) => (
-        // Fixed the Fragment issue by removing the data-lov-id attribute
         <React.Fragment key={`row-${rowIndex}`}>
           {row.map((location) => {
             const isCurrent = location.x === currentLocation.x && location.y === currentLocation.y;
@@ -145,17 +194,17 @@ const CityGrid: React.FC<CityGridProps> = ({
                 onClick={() => isReachable && onLocationSelect(location)}
                 className={cn(
                   "relative h-12 p-1 rounded flex flex-col items-center justify-center text-xs transition-all",
-                  isCurrent ? "bg-[#FE5F55] text-white" : 
-                    isReachable ? "bg-[#5B3C80] hover:bg-[#744C9E] text-[#F0EBF4]" : 
-                    "bg-[#2F2E33]/70 text-[#A3A1A8]/50 cursor-not-allowed"
+                  isCurrent ? `${colors.currentBg} ${colors.currentText}` : 
+                    isReachable ? `${colors.reachableBg} ${colors.reachableBgHover} ${colors.reachableText}` : 
+                    `${colors.unreachableBg} ${colors.unreachableText} cursor-not-allowed`
                 )}
                 disabled={!isReachable && !isCurrent}
               >
                 <LocationIcon 
                   type={location.type} 
                   className={cn(
-                    isCurrent ? "text-white" : 
-                      isReachable ? "text-[#BCD8C1]" : "text-[#A3A1A8]/50"
+                    isCurrent ? colors.currentText : 
+                      isReachable ? colors.reachableIcon : colors.unreachableText
                   )} 
                 />
                 <div className="text-[9px] mt-0.5">

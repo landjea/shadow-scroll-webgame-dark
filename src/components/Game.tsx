@@ -42,7 +42,7 @@ const Game: React.FC = () => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, [isMobile, isOpen]);
 
-  // Add some console logging to help debug issues
+  // Log for debugging
   useEffect(() => {
     console.log("Game component rendered with:", { 
       cityGridExists: !!cityGrid, 
@@ -54,20 +54,34 @@ const Game: React.FC = () => {
   }, [cityGrid, currentLocation, theme]);
 
   // Get theme-specific background colors
-  const getThemeBackgroundColor = () => {
+  const getThemeStyles = () => {
     switch (theme) {
       case 'batman':
-        return 'bg-batman-dark';
+        return {
+          bg: 'bg-batman-dark',
+          borderColor: 'border-gray-800/50',
+          textColor: 'text-gray-200'
+        };
       case 'superman':
-        return 'bg-superman-blue';
+        return {
+          bg: 'bg-superman-blue',
+          borderColor: 'border-blue-800/50',
+          textColor: 'text-blue-50'
+        };
       case 'starfire':
       default:
-        return 'bg-purple-950';
+        return {
+          bg: 'bg-purple-950',
+          borderColor: 'border-purple-900/50',
+          textColor: 'text-neutral-50'
+        };
     }
   };
 
+  const styles = getThemeStyles();
+
   return (
-    <div className={`h-screen overflow-hidden flex flex-col text-neutral-50 ${getThemeBackgroundColor()}`}>
+    <div className={`h-screen overflow-hidden flex flex-col ${styles.textColor} ${styles.bg}`}>
       {/* Game header with stats and controls */}
       <GameHeader 
         heroHealth={heroHealth} 
@@ -75,7 +89,7 @@ const Game: React.FC = () => {
         heroSpeed={heroSpeed}
       />
       
-      <div className="flex flex-1 pt-14 overflow-hidden">
+      <div className="flex-1 pt-14 flex overflow-hidden">
         {/* Sidebar for inventory, abilities, etc */}
         <GameSidebar 
           heroSpeed={heroSpeed} 
@@ -83,7 +97,7 @@ const Game: React.FC = () => {
         />
         
         {/* Main game grid area */}
-        <main className={`flex-1 ${isOpen && isMobile ? 'hidden' : 'flex flex-col'} overflow-hidden`}>
+        <main className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-hidden relative">
             {cityGrid && currentLocation ? (
               <CityGrid 
@@ -101,11 +115,7 @@ const Game: React.FC = () => {
             
             {/* Game log console (fixed at bottom) */}
             <div className="absolute bottom-0 w-full">
-              <div className={`flex flex-col space-y-4 px-4 py-3 border-t border-purple-900/50 ${
-                theme === 'batman' ? 'bg-batman-dark/80' : 
-                theme === 'superman' ? 'bg-superman-blue/80' : 
-                'bg-purple-950/80'
-              }`}>
+              <div className={`flex flex-col space-y-4 px-4 py-3 border-t ${styles.borderColor} ${styles.bg}/80`}>
                 <GameAvailableActions 
                   actions={gameActions} 
                   onAction={handleAction} 

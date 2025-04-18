@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
@@ -9,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface GameSidebarProps {
   heroSpeed: number;
@@ -26,6 +26,7 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { signOut, isAdmin, user } = useAuth();
+  const { theme } = useTheme();
   
   const heroStats = [
     { name: "Strength", value: characterStats?.strength || 10 },
@@ -41,6 +42,38 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
     { name: "Flight", icon: <Flame size={16} className="text-red-500" /> },
     { name: "Invulnerability", icon: <Star size={16} className="text-purple-400" /> }
   ];
+  
+  const getSidebarColors = () => {
+    switch (theme) {
+      case 'batman':
+        return {
+          bg: 'bg-batman-dark',
+          border: 'border-gray-800/80',
+          headerBg: 'bg-batman-dark',
+          text: 'text-gray-300',
+          highlight: 'text-batman-gold'
+        };
+      case 'superman':
+        return {
+          bg: 'bg-superman-blue',
+          border: 'border-blue-800/80',
+          headerBg: 'bg-superman-blue',
+          text: 'text-blue-100',
+          highlight: 'text-superman-red'
+        };
+      case 'starfire':
+      default:
+        return {
+          bg: 'bg-purple-950',
+          border: 'border-purple-900/80',
+          headerBg: 'bg-purple-950',
+          text: 'text-purple-300',
+          highlight: 'text-game-accent'
+        };
+    }
+  };
+  
+  const colors = getSidebarColors();
   
   const adminOptions = [
     { 
@@ -96,7 +129,6 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
     navigate(path);
   };
 
-  // Function to check if a path is active or is a parent of the current path
   const isActivePath = (path: string) => {
     if (path === '/') {
       return location.pathname === '/';
@@ -108,9 +140,8 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
   console.log("Current location:", location.pathname);
 
   return (
-    <div className="h-full w-full bg-purple-950 border-r border-purple-900/80 flex flex-col sidebar">
-      {/* User Profile Section */}
-      <div className="p-4 border-b border-purple-900/80">
+    <div className={`h-full w-64 flex-shrink-0 ${colors.bg} border-r ${colors.border} flex flex-col sidebar`}>
+      <div className={`p-4 border-b ${colors.border}`}>
         <Popover>
           <PopoverTrigger asChild>
             <button className="w-full flex items-center justify-between">
@@ -119,7 +150,7 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
                   <User size={24} className="text-purple-950" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-purple-300">
+                  <h2 className={`font-bold ${colors.text}`}>
                     {characterStats?.hero_name || user?.email?.split('@')[0] || 'Hero'}
                   </h2>
                   <p className="text-xs text-purple-400">Level {characterStats?.level || 1} Superhero</p>
@@ -128,14 +159,14 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
               <ChevronRight size={16} className="text-purple-400" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-80 p-0 bg-purple-900 border border-purple-800" align="start">
+          <PopoverContent className={`w-80 p-0 ${colors.bg} border ${colors.border}`} align="start">
             <div className="p-4 bg-purple-950 border-b border-purple-900/80">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-14 h-14 rounded-full bg-game-accent flex items-center justify-center">
                   <User size={28} className="text-purple-950" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-lg text-purple-300">
+                  <h2 className={`font-bold text-lg ${colors.text}`}>
                     {characterStats?.hero_name || user?.email?.split('@')[0] || 'Hero'}
                   </h2>
                   <p className="text-sm text-purple-400">Level {characterStats?.level || 1} Superhero</p>
@@ -180,9 +211,8 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
         </Popover>
       </div>
       
-      {/* Navigation Section */}
       <nav className="p-4">
-        <h3 className="font-semibold text-purple-300 text-sm mb-3">NAVIGATION</h3>
+        <h3 className={`font-semibold ${colors.text} text-sm mb-3`}>NAVIGATION</h3>
         <ul className="space-y-2">
           {navigationTabs.map((tab) => (
             <li key={tab.name}>
@@ -198,7 +228,6 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
             </li>
           ))}
           
-          {/* Admin Flyout Menu - Only show if user is admin */}
           {isAdmin && (
             <li>
               <Popover>
@@ -238,7 +267,6 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
             </li>
           )}
           
-          {/* Sign Out Button */}
           <li>
             <Button 
               variant="ghost"
@@ -252,9 +280,8 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
         </ul>
       </nav>
       
-      {/* Current Mission Section */}
-      <div className="mt-auto p-4 border-t border-purple-900/80">
-        <h3 className="font-semibold text-purple-300 text-sm mb-2">CURRENT MISSION</h3>
+      <div className={`mt-auto p-4 border-t ${colors.border}`}>
+        <h3 className={`font-semibold ${colors.text} text-sm mb-2`}>CURRENT MISSION</h3>
         <p className="text-sm text-purple-200">Stop the bank robbery downtown</p>
         <div className="flex items-center space-x-2 mt-2">
           <div className="w-full bg-purple-950 rounded-full h-1.5">

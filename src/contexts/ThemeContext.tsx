@@ -49,30 +49,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // Force theme application by directly setting style attributes
       document.body.setAttribute('data-theme', theme);
       
-      // Forcefully set the game background colors
-      setTimeout(() => {
-        const gameElements = document.querySelectorAll('.game-panel, .game-sidebar');
-        gameElements.forEach(element => {
-          (element as HTMLElement).style.backgroundColor = theme === 'batman' ? '#1A1A1A' : 
-            theme === 'superman' ? '#0A3161' : '#2D1B69';
-        });
-        
-        // Apply theme to any other game elements that need theming
-        const gameContainer = document.querySelector('.h-screen');
-        if (gameContainer) {
-          gameContainer.classList.remove('bg-batman-dark', 'bg-superman-blue', 'bg-purple-900');
-          if (theme === 'batman') {
-            gameContainer.classList.add('bg-batman-dark');
-          } else if (theme === 'superman') {
-            gameContainer.classList.add('bg-superman-blue');
-          } else {
-            gameContainer.classList.add('bg-purple-900');
-          }
-        }
-        
-        console.log(`Theme applied with force: ${theme} - BG: ${bgColor}, Text: ${textColor}`);
-      }, 100);
-      
       // Save the theme preference to localStorage
       localStorage.setItem('theme', theme);
       
@@ -87,7 +63,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const timeoutIds = [
       setTimeout(applyThemeStyles, 50),
       setTimeout(applyThemeStyles, 200),
-      setTimeout(applyThemeStyles, 500)
+      setTimeout(applyThemeStyles, 500),
+      setTimeout(applyThemeStyles, 1000)
     ];
     
     return () => timeoutIds.forEach(id => clearTimeout(id));
