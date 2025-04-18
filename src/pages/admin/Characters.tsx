@@ -113,9 +113,9 @@ const CharactersAdmin: React.FC = () => {
         <AdminEmptyState
           title="No characters found"
           description="You haven't created any characters yet. Get started by adding a new hero or villain."
-          buttonText="Add Character"
+          addButtonText="Add Character"
           buttonIcon={<PlusCircle className="h-4 w-4" />}
-          onButtonClick={openAddDialog}
+          onAddNew={openAddDialog}
         />
       ) : (
         <div className="rounded-md border">
@@ -184,6 +184,7 @@ const CharactersAdmin: React.FC = () => {
           <form onSubmit={(e) => handleSubmit(e, editItem)}>
             <div className="space-y-4 py-2">
               <FormField
+                id="name"
                 label="Character Name"
                 name="name"
                 placeholder="e.g., Superman"
@@ -213,14 +214,17 @@ const CharactersAdmin: React.FC = () => {
                 </div>
                 
                 <CheckboxField
+                  id="is_playable"
                   label="Playable Character"
                   name="is_playable"
                   checked={formData.is_playable}
                   onChange={handleInputChange}
+                  description="Can be played by users"
                 />
               </div>
               
               <TextareaField
+                id="backstory"
                 label="Backstory"
                 name="backstory"
                 placeholder="Character's origin story and background..."
@@ -229,6 +233,7 @@ const CharactersAdmin: React.FC = () => {
               />
               
               <FormField
+                id="abilities"
                 label="Abilities (comma separated)"
                 name="abilities"
                 placeholder="e.g., Flight, Super Strength, Heat Vision"
@@ -243,6 +248,7 @@ const CharactersAdmin: React.FC = () => {
                 resetForm();
               }}
               isSubmitting={submitting}
+              isEditing={!!editItem}
             />
           </form>
         </DialogContent>

@@ -91,9 +91,9 @@ const StoriesAdmin: React.FC = () => {
         <AdminEmptyState
           title="No stories found"
           description="You haven't created any story content yet. Get started by adding a new story."
-          buttonText="Add Story"
+          addButtonText="Add Story"
           buttonIcon={<PlusCircle className="h-4 w-4" />}
-          onButtonClick={openAddDialog}
+          onAddNew={openAddDialog}
         />
       ) : (
         <div className="rounded-md border">
@@ -120,7 +120,7 @@ const StoriesAdmin: React.FC = () => {
                     <td className="p-3">{story.sequence}</td>
                     <td className="p-3">
                       <AdminStatus 
-                        isActive={story.is_published} 
+                        value={story.is_published} 
                         activeText="Published" 
                         inactiveText="Draft" 
                       />
@@ -154,6 +154,7 @@ const StoriesAdmin: React.FC = () => {
           <form onSubmit={(e) => handleSubmit(e, editItem)}>
             <div className="space-y-4 py-2">
               <FormField
+                id="title"
                 label="Story Title"
                 name="title"
                 placeholder="e.g., Origin of the Hero"
@@ -164,6 +165,7 @@ const StoriesAdmin: React.FC = () => {
               
               <div className="grid grid-cols-2 gap-4">
                 <FormField
+                  id="sequence"
                   label="Sequence Number"
                   name="sequence"
                   type="number"
@@ -173,14 +175,17 @@ const StoriesAdmin: React.FC = () => {
                 />
                 
                 <CheckboxField
+                  id="is_published"
                   label="Published"
                   name="is_published"
                   checked={formData.is_published}
                   onChange={handleInputChange}
+                  description="Make this story visible to players"
                 />
               </div>
               
               <TextareaField
+                id="content"
                 label="Story Content"
                 name="content"
                 placeholder="Write your story content here..."
@@ -191,6 +196,7 @@ const StoriesAdmin: React.FC = () => {
               />
               
               <TextareaField
+                id="requirements"
                 label="Requirements (optional)"
                 name="requirements"
                 placeholder="e.g., Complete Mission 'City in Danger'"
@@ -205,6 +211,7 @@ const StoriesAdmin: React.FC = () => {
                 resetForm();
               }}
               isSubmitting={submitting}
+              isEditing={!!editItem}
             />
           </form>
         </DialogContent>

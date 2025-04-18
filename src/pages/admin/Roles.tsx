@@ -176,11 +176,11 @@ const RolesAdmin: React.FC = () => {
         <LoadingState />
       ) : !filteredRoles || filteredRoles.length === 0 ? (
         <AdminEmptyState
-          icon={Shield}
           title="No roles found"
           description={searchQuery ? "No roles matching your search criteria." : "Start by adding roles to users."}
-          onAddNew={() => setDialogOpen(true)}
           addButtonText="Add First Role"
+          onAddNew={() => setDialogOpen(true)}
+          buttonIcon={<Shield className="h-4 w-4" />}
         />
       ) : (
         <RolesTable 

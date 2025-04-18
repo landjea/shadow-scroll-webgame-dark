@@ -114,9 +114,9 @@ const LocationsAdmin: React.FC = () => {
         <AdminEmptyState
           title="No locations found"
           description="You haven't created any map locations yet. Get started by adding a new location."
-          buttonText="Add Location"
+          addButtonText="Add Location"
           buttonIcon={<PlusCircle className="h-4 w-4" />}
-          onButtonClick={openAddDialog}
+          onAddNew={openAddDialog}
         />
       ) : (
         <div className="rounded-md border">
@@ -173,6 +173,7 @@ const LocationsAdmin: React.FC = () => {
           <form onSubmit={(e) => handleSubmit(e, editItem)}>
             <div className="space-y-4 py-2">
               <FormField
+                id="name"
                 label="Location Name"
                 name="name"
                 placeholder="e.g., Crystal Falls"
@@ -202,14 +203,17 @@ const LocationsAdmin: React.FC = () => {
                 </div>
                 
                 <CheckboxField
+                  id="is_unlocked"
                   label="Unlocked"
                   name="is_unlocked"
                   checked={formData.is_unlocked}
                   onChange={handleInputChange}
+                  description="Available to players"
                 />
               </div>
               
               <TextareaField
+                id="description"
                 label="Description"
                 name="description"
                 placeholder="Describe this location and what players can find here..."
@@ -219,6 +223,7 @@ const LocationsAdmin: React.FC = () => {
               
               <div className="grid grid-cols-2 gap-4">
                 <FormField
+                  id="x_coord"
                   label="X Coordinate"
                   name="x_coord"
                   type="number"
@@ -228,6 +233,7 @@ const LocationsAdmin: React.FC = () => {
                 />
                 
                 <FormField
+                  id="y_coord"
                   label="Y Coordinate"
                   name="y_coord"
                   type="number"
@@ -244,6 +250,7 @@ const LocationsAdmin: React.FC = () => {
                 resetForm();
               }}
               isSubmitting={submitting}
+              isEditing={!!editItem}
             />
           </form>
         </DialogContent>

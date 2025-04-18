@@ -111,9 +111,9 @@ const MissionsAdmin: React.FC = () => {
         <AdminEmptyState
           title="No missions found"
           description="You haven't created any missions yet. Get started by adding a new quest."
-          buttonText="Add Mission"
+          addButtonText="Add Mission"
           buttonIcon={<PlusCircle className="h-4 w-4" />}
-          onButtonClick={openAddDialog}
+          onAddNew={openAddDialog}
         />
       ) : (
         <div className="rounded-md border">
@@ -137,7 +137,7 @@ const MissionsAdmin: React.FC = () => {
                     className={`${getDifficultyColor(mission.difficulty)} text-white`}
                   />
                   <AdminStatus 
-                    isActive={mission.is_active} 
+                    value={mission.is_active} 
                     activeText="Active" 
                     inactiveText="Inactive" 
                   />
@@ -166,6 +166,7 @@ const MissionsAdmin: React.FC = () => {
           <form onSubmit={(e) => handleSubmit(e, editItem)}>
             <div className="space-y-4 py-2">
               <FormField
+                id="title"
                 label="Mission Title"
                 name="title"
                 placeholder="e.g., Rescue the Mayor"
@@ -195,14 +196,17 @@ const MissionsAdmin: React.FC = () => {
                 </div>
                 
                 <CheckboxField
+                  id="is_active"
                   label="Active Mission"
                   name="is_active"
                   checked={formData.is_active}
                   onChange={handleInputChange}
+                  description="Available to players"
                 />
               </div>
               
               <TextareaField
+                id="description"
                 label="Mission Description"
                 name="description"
                 placeholder="Describe the mission objectives and story..."
@@ -212,6 +216,7 @@ const MissionsAdmin: React.FC = () => {
               />
               
               <TextareaField
+                id="rewards"
                 label="Rewards"
                 name="rewards"
                 placeholder="e.g., 500 XP, Legendary Cape, 1000 Gold"
@@ -221,6 +226,7 @@ const MissionsAdmin: React.FC = () => {
               />
               
               <FormField
+                id="location_id"
                 label="Location ID (optional)"
                 name="location_id"
                 placeholder="e.g., location-123"
@@ -235,6 +241,7 @@ const MissionsAdmin: React.FC = () => {
                 resetForm();
               }}
               isSubmitting={submitting}
+              isEditing={!!editItem}
             />
           </form>
         </DialogContent>

@@ -6,27 +6,31 @@ import { Plus } from 'lucide-react';
 interface AdminEmptyStateProps {
   title: string;
   description: string;
+  // New prop names
   addButtonText: string;
-  buttonIcon?: React.ReactNode;
   onAddNew: () => void;
+  buttonIcon?: React.ReactNode;
   // For backward compatibility:
   buttonText?: string; 
   onButtonClick?: () => void;
+  icon?: React.ReactNode;
 }
 
 const AdminEmptyState: React.FC<AdminEmptyStateProps> = ({
   title,
   description,
   addButtonText,
-  buttonIcon = <Plus className="mr-2 h-4 w-4" />,
   onAddNew,
-  // Handle backward compatibility:
+  buttonIcon = <Plus className="mr-2 h-4 w-4" />,
+  // Handle backward compatibility
   buttonText,
-  onButtonClick
+  onButtonClick,
+  icon
 }) => {
   // Use the newer props first, fall back to older ones if needed
   const finalButtonText = buttonText || addButtonText;
   const finalClickHandler = onButtonClick || onAddNew;
+  const finalIcon = icon || buttonIcon;
   
   return (
     <div className="text-center my-12 p-8 border border-dashed rounded-lg">
@@ -36,7 +40,7 @@ const AdminEmptyState: React.FC<AdminEmptyStateProps> = ({
         onClick={finalClickHandler}
         className="bg-purple-600 hover:bg-purple-700"
       >
-        {buttonIcon}
+        {finalIcon}
         {finalButtonText}
       </Button>
     </div>

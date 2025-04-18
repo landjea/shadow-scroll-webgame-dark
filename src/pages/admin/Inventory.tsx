@@ -225,11 +225,11 @@ const InventoryAdmin: React.FC = () => {
         <LoadingState />
       ) : inventoryItems?.length === 0 ? (
         <AdminEmptyState 
-          icon={Package}
           title="No items found"
           description="Start by adding some items to your inventory."
-          onAddNew={openAddDialog}
           addButtonText="Add First Item"
+          onAddNew={openAddDialog}
+          buttonIcon={<Package className="h-4 w-4" />}
         />
       ) : (
         <Table>
