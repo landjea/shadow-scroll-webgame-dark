@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile'; 
 import { useTheme } from '@/contexts/ThemeContext';
@@ -29,7 +28,6 @@ const Game: React.FC = () => {
   } = useGameState();
   
   useEffect(() => {
-    // Close sidebar on mobile when clicking outside
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (isMobile && isOpen && !target.closest('.sidebar')) {
@@ -41,7 +39,6 @@ const Game: React.FC = () => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, [isMobile, isOpen]);
 
-  // Log for debugging
   useEffect(() => {
     console.log("Game component rendered with:", { 
       cityGridExists: !!cityGrid, 
@@ -52,7 +49,6 @@ const Game: React.FC = () => {
     });
   }, [cityGrid, currentLocation, theme]);
 
-  // Get theme-specific background colors
   const getThemeStyles = () => {
     switch (theme) {
       case 'batman':
@@ -81,7 +77,6 @@ const Game: React.FC = () => {
 
   return (
     <div className={`h-screen overflow-hidden flex flex-col ${styles.textColor} ${styles.bg}`}>
-      {/* Game header with stats and controls */}
       <GameHeader 
         heroHealth={heroHealth} 
         heroEnergy={heroEnergy}
@@ -89,15 +84,12 @@ const Game: React.FC = () => {
       />
       
       <div className="flex-1 pt-14 flex overflow-hidden">
-        {/* Sidebar for inventory, abilities, etc */}
         <GameSidebar 
           heroSpeed={heroSpeed} 
           characterStats={characterStats}
         />
         
-        {/* Main game grid area */}
         <main className="flex-1 flex flex-col overflow-hidden">
-          {/* City Grid Container - now with a percentage-based height */}
           <div className="h-[60%] overflow-auto">
             {cityGrid && currentLocation ? (
               <CityGrid 
@@ -114,17 +106,14 @@ const Game: React.FC = () => {
             )}
           </div>
           
-          {/* Game actions and log - now with a percentage-based height and scrolling */}
-          <div className={`h-[40%] ${styles.bg} ${styles.borderColor} border-t overflow-y-auto`}>
-            <div className="p-4 flex flex-col h-full">
-              <div className="mb-4">
+          <div className={`h-[40%] ${styles.bg} ${styles.borderColor} border-t`}>
+            <div className="p-4 h-full overflow-y-auto">
+              <div className="space-y-4">
                 <GameAvailableActions 
                   actions={gameActions} 
                   onAction={handleAction} 
                   heroEnergy={heroEnergy}
                 />
-              </div>
-              <div className="flex-1 overflow-y-auto">
                 <GameActionLog entries={actionLog} />
               </div>
             </div>
@@ -132,7 +121,6 @@ const Game: React.FC = () => {
         </main>
       </div>
       
-      {/* Theme debug indicator */}
       <ThemeDebug />
     </div>
   );

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -10,7 +9,7 @@ const GameActionLog: React.FC<GameActionLogProps> = ({ entries }) => {
   return (
     <div>
       <h3 className="text-lg font-semibold text-blue-300 mb-2">Action Log</h3>
-      <ScrollArea className="h-[120px] rounded-md border border-blue-900/30">
+      <div className="rounded-md border border-blue-900/30">
         <div className="p-3 bg-blue-950/80">
           {entries.map((entry, index) => (
             <div 
@@ -21,7 +20,7 @@ const GameActionLog: React.FC<GameActionLogProps> = ({ entries }) => {
             </div>
           ))}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 };
