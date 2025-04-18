@@ -1,9 +1,18 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const ThemeDebug: React.FC = () => {
   const { theme } = useTheme();
+  const [bodyBgColor, setBodyBgColor] = useState('');
+  const [bodyTextColor, setBodyTextColor] = useState('');
+  
+  useEffect(() => {
+    // Get actual computed colors
+    const computedStyle = getComputedStyle(document.body);
+    setBodyBgColor(computedStyle.backgroundColor);
+    setBodyTextColor(computedStyle.color);
+  }, [theme]);
   
   const getThemeColors = () => {
     switch (theme) {
@@ -18,8 +27,7 @@ const ThemeDebug: React.FC = () => {
   };
   
   const getActualColors = () => {
-    const computedStyle = getComputedStyle(document.body);
-    return `actual bg: ${computedStyle.backgroundColor}, actual text: ${computedStyle.color}`;
+    return `actual bg: ${bodyBgColor}, actual text: ${bodyTextColor}`;
   };
   
   return (
@@ -27,6 +35,20 @@ const ThemeDebug: React.FC = () => {
       <p>Current Theme: {theme}</p>
       <p className="text-[10px] opacity-70">{getThemeColors()}</p>
       <p className="text-[10px] opacity-70">{getActualColors()}</p>
+      <button 
+        className="text-[10px] mt-1 px-2 py-0.5 bg-purple-600 text-white rounded"
+        onClick={() => {
+          // Force apply theme styles again
+          document.body.classList.remove('theme-starfire', 'theme-batman', 'theme-superman');
+          document.body.classList.add(`theme-${theme}`);
+          // Update the computed colors
+          const computedStyle = getComputedStyle(document.body);
+          setBodyBgColor(computedStyle.backgroundColor);
+          setBodyTextColor(computedStyle.color);
+        }}
+      >
+        Force Apply Theme
+      </button>
     </div>
   );
 };

@@ -85,7 +85,7 @@
     font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
   }
 
-  /* Specific theme overrides for body */
+  /* Specific theme overrides for body - !important ensures these take precedence */
   body.theme-starfire {
     background-color: #2D1B69 !important;
     color: #F8F9FA !important;
@@ -103,6 +103,19 @@
 
   html {
     @apply scroll-smooth;
+  }
+
+  /* Add additional theme styling for game elements */
+  .theme-starfire .game-panel {
+    @apply bg-purple-950 border-purple-800/60;
+  }
+
+  .theme-batman .game-panel {
+    @apply bg-batman-dark border-gray-800/60;
+  }
+
+  .theme-superman .game-panel {
+    @apply bg-superman-blue border-blue-800/60;
   }
 }
 

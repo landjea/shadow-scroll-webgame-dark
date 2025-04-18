@@ -133,6 +133,7 @@ const CityGrid: React.FC<CityGridProps> = ({
   return (
     <div className="grid grid-cols-7 gap-1 p-2 rounded-md border" style={{ background: "#2F2E33", borderColor: "#2F2E33" }}>
       {centeredGrid.map((row, rowIndex) => (
+        // Fixed the Fragment issue by removing the data-lov-id attribute
         <React.Fragment key={`row-${rowIndex}`}>
           {row.map((location) => {
             const isCurrent = location.x === currentLocation.x && location.y === currentLocation.y;

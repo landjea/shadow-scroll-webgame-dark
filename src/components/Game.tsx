@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile'; 
+import { useTheme } from '@/contexts/ThemeContext';
 import GameHeader from './GameHeader';
 import GameSidebar from './GameSidebar';
 import CityGrid from './CityGrid';
@@ -13,6 +14,7 @@ import ThemeDebug from './ThemeDebug';
 const Game: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { theme } = useTheme();
   const {
     cityGrid,
     currentLocation,
@@ -46,12 +48,26 @@ const Game: React.FC = () => {
       cityGridExists: !!cityGrid, 
       currentLocationExists: !!currentLocation,
       cityGridSize: cityGrid ? `${cityGrid.length}x${cityGrid[0]?.length}` : 'N/A',
-      currentLocation: currentLocation ? `(${currentLocation.x},${currentLocation.y})` : 'N/A'
+      currentLocation: currentLocation ? `(${currentLocation.x},${currentLocation.y})` : 'N/A',
+      currentTheme: theme
     });
-  }, [cityGrid, currentLocation]);
+  }, [cityGrid, currentLocation, theme]);
+
+  // Get theme-specific background colors
+  const getThemeBackgroundColor = () => {
+    switch (theme) {
+      case 'batman':
+        return 'bg-batman-dark';
+      case 'superman':
+        return 'bg-superman-blue';
+      case 'starfire':
+      default:
+        return 'bg-purple-950';
+    }
+  };
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col text-neutral-50">
+    <div className={`h-screen overflow-hidden flex flex-col text-neutral-50 ${getThemeBackgroundColor()}`}>
       {/* Game header with stats and controls */}
       <GameHeader 
         heroHealth={heroHealth} 
@@ -85,7 +101,11 @@ const Game: React.FC = () => {
             
             {/* Game log console (fixed at bottom) */}
             <div className="absolute bottom-0 w-full">
-              <div className="flex flex-col space-y-4 px-4 py-3 bg-purple-950/80 border-t border-purple-900/50">
+              <div className={`flex flex-col space-y-4 px-4 py-3 border-t border-purple-900/50 ${
+                theme === 'batman' ? 'bg-batman-dark/80' : 
+                theme === 'superman' ? 'bg-superman-blue/80' : 
+                'bg-purple-950/80'
+              }`}>
                 <GameAvailableActions 
                   actions={gameActions} 
                   onAction={handleAction} 
