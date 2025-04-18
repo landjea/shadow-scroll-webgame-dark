@@ -15,9 +15,9 @@ const GameAvailableActions: React.FC<GameAvailableActionsProps> = ({
   heroEnergy
 }) => {
   return (
-    <>
-      <h3 className="text-lg font-semibold text-blue-300 mb-4">Available Actions</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div className="flex flex-col">
+      <h3 className="text-lg font-semibold text-blue-300 mb-2">Available Actions</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 overflow-auto">
         {actions.map((action) => (
           <GameActionButton 
             key={action.id}
@@ -27,7 +27,7 @@ const GameAvailableActions: React.FC<GameAvailableActionsProps> = ({
           />
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

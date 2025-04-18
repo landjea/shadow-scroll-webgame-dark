@@ -5,7 +5,6 @@ import { useTheme } from '@/contexts/ThemeContext';
 import GameHeader from './GameHeader';
 import GameSidebar from './GameSidebar';
 import CityGrid from './CityGrid';
-import GameConsole from './GameConsole';
 import GameAvailableActions from './GameAvailableActions';
 import GameActionLog from './GameActionLog';
 import { useGameState } from '@/hooks/useGameState';
@@ -98,7 +97,8 @@ const Game: React.FC = () => {
         
         {/* Main game grid area */}
         <main className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-hidden relative">
+          {/* City Grid Container - fixed height to prevent overlap */}
+          <div className="h-[calc(100%-180px)] overflow-auto">
             {cityGrid && currentLocation ? (
               <CityGrid 
                 grid={cityGrid}
@@ -112,15 +112,17 @@ const Game: React.FC = () => {
                 <p className="text-lg">Loading game map...</p>
               </div>
             )}
-            
-            {/* Game log console (fixed at bottom) */}
-            <div className="absolute bottom-0 w-full">
-              <div className={`flex flex-col space-y-4 px-4 py-3 border-t ${styles.borderColor} ${styles.bg}/80`}>
-                <GameAvailableActions 
-                  actions={gameActions} 
-                  onAction={handleAction} 
-                  heroEnergy={heroEnergy}
-                />
+          </div>
+          
+          {/* Game actions and log - now as a separate section below the grid */}
+          <div className={`h-[180px] ${styles.bg} ${styles.borderColor} border-t`}>
+            <div className="p-4 flex flex-col h-full overflow-hidden">
+              <GameAvailableActions 
+                actions={gameActions} 
+                onAction={handleAction} 
+                heroEnergy={heroEnergy}
+              />
+              <div className="mt-2 overflow-auto">
                 <GameActionLog entries={actionLog} />
               </div>
             </div>

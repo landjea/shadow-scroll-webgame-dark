@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { GameAction } from '@/types/game';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface GameActionButtonProps {
   action: GameAction;
@@ -13,19 +14,54 @@ const GameActionButton: React.FC<GameActionButtonProps> = ({
   onAction, 
   disabled = false 
 }) => {
+  const { theme } = useTheme();
+
+  // Get theme-specific colors
+  const getButtonColors = () => {
+    switch (theme) {
+      case 'batman':
+        return {
+          bg: 'bg-gray-800',
+          hoverBg: 'hover:bg-gray-700',
+          iconBg: 'bg-gray-900',
+          text: 'text-gray-200',
+          subtext: 'text-gray-400'
+        };
+      case 'superman':
+        return {
+          bg: 'bg-blue-900',
+          hoverBg: 'hover:bg-blue-800',
+          iconBg: 'bg-blue-950',
+          text: 'text-blue-100',
+          subtext: 'text-blue-300'
+        };
+      case 'starfire':
+      default:
+        return {
+          bg: 'bg-purple-900',
+          hoverBg: 'hover:bg-purple-800',
+          iconBg: 'bg-purple-950',
+          text: 'text-purple-100',
+          subtext: 'text-purple-300'
+        };
+    }
+  };
+
+  const colors = getButtonColors();
+
   return (
     <button
       key={action.id}
       onClick={() => onAction(action.id)}
-      className="bg-blue-900 hover:bg-blue-800 rounded-lg p-4 transition-all flex items-start space-x-3 text-left"
+      className={`${colors.bg} ${colors.hoverBg} rounded-lg p-2 transition-all flex items-start space-x-2 text-left disabled:opacity-50 disabled:cursor-not-allowed`}
       disabled={disabled}
     >
-      <div className="bg-blue-950 p-3 rounded-full">
+      <div className={`${colors.iconBg} p-2 rounded-full`}>
         {action.icon}
       </div>
       <div>
-        <h4 className="font-semibold text-blue-100">{action.label}</h4>
-        <p className="text-sm text-blue-400 mt-1">{action.description}</p>
+        <h4 className={`font-semibold ${colors.text} text-sm`}>{action.label}</h4>
+        <p className={`text-xs ${colors.subtext}`}>{action.description}</p>
       </div>
     </button>
   );
