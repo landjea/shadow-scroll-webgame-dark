@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile'; 
 import { useTheme } from '@/contexts/ThemeContext';
@@ -38,16 +39,6 @@ const Game: React.FC = () => {
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, [isMobile, isOpen]);
-
-  useEffect(() => {
-    console.log("Game component rendered with:", { 
-      cityGridExists: !!cityGrid, 
-      currentLocationExists: !!currentLocation,
-      cityGridSize: cityGrid ? `${cityGrid.length}x${cityGrid[0]?.length}` : 'N/A',
-      currentLocation: currentLocation ? `(${currentLocation.x},${currentLocation.y})` : 'N/A',
-      currentTheme: theme
-    });
-  }, [cityGrid, currentLocation, theme]);
 
   const getThemeStyles = () => {
     switch (theme) {
@@ -127,3 +118,4 @@ const Game: React.FC = () => {
 };
 
 export default Game;
+

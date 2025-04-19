@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -80,12 +79,11 @@ export default {
 					white: '#F0EBF4',
 					grey: '#A3A1A8'
 				},
-				// Batman theme colors - expanded
 				batman: {
 					dark: '#1A1F2C',
 					black: '#000000e6',
 					'dark-accent': '#0006',
-					gray: '#2226',
+					gray: '#8E9196',
 					gold: '#FFC700',
 					yellow: '#FFC700',
 					accent: '#FFC700',
@@ -94,16 +92,16 @@ export default {
 						light: '#555555',
 						dark: '#222222',
 					},
+					border: '#403E43'
 				},
-				// Superman theme colors - expanded
 				superman: {
 					red: '#ea384c',
 					blue: '#0A3161',
 					'blue-light': '#1EAEDB',
 					yellow: '#FEF7CD',
-					accent: '#ea384c',
+					accent: '#FFFFFF',
+					border: '#8E9196'
 				},
-				// Starfire theme colors - expanded
 				starfire: {
 					purple: '#2D1B69',
 					'purple-light': '#9b87f5',
