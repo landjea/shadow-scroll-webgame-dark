@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
@@ -51,7 +52,12 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
           border: 'border-gray-800/80',
           headerBg: 'bg-batman-dark',
           text: 'text-gray-300',
-          highlight: 'text-batman-gold'
+          highlight: 'text-batman-gold',
+          navButton: 'text-gray-400 hover:bg-gray-800 hover:text-gray-200',
+          navActive: 'bg-gray-800 text-gray-200',
+          subText: 'text-gray-400',
+          progBg: 'bg-gray-900', 
+          missionText: 'text-gray-300'
         };
       case 'superman':
         return {
@@ -59,7 +65,12 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
           border: 'border-blue-800/80',
           headerBg: 'bg-superman-blue',
           text: 'text-blue-100',
-          highlight: 'text-superman-red'
+          highlight: 'text-superman-red',
+          navButton: 'text-blue-300 hover:bg-blue-800 hover:text-blue-100',
+          navActive: 'bg-blue-800 text-blue-100',
+          subText: 'text-blue-300',
+          progBg: 'bg-blue-900',
+          missionText: 'text-blue-200'
         };
       case 'starfire':
       default:
@@ -68,7 +79,12 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
           border: 'border-purple-900/80',
           headerBg: 'bg-purple-950',
           text: 'text-purple-300',
-          highlight: 'text-game-accent'
+          highlight: 'text-game-accent',
+          navButton: 'text-purple-400 hover:bg-purple-900 hover:text-purple-200',
+          navActive: 'bg-purple-900 text-purple-200',
+          subText: 'text-purple-400',
+          progBg: 'bg-purple-950',
+          missionText: 'text-purple-200'
         };
     }
   };
@@ -153,14 +169,14 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
                   <h2 className={`font-bold ${colors.text}`}>
                     {characterStats?.hero_name || user?.email?.split('@')[0] || 'Hero'}
                   </h2>
-                  <p className="text-xs text-purple-400">Level {characterStats?.level || 1} Superhero</p>
+                  <p className={`text-xs ${colors.subText}`}>Level {characterStats?.level || 1} Superhero</p>
                 </div>
               </div>
-              <ChevronRight size={16} className="text-purple-400" />
+              <ChevronRight size={16} className={colors.subText} />
             </button>
           </PopoverTrigger>
           <PopoverContent className={`w-80 p-0 ${colors.bg} border ${colors.border}`} align="start">
-            <div className="p-4 bg-purple-950 border-b border-purple-900/80">
+            <div className={`p-4 ${colors.headerBg} border-b ${colors.border}`}>
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-14 h-14 rounded-full bg-game-accent flex items-center justify-center">
                   <User size={28} className="text-purple-950" />
@@ -169,22 +185,22 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
                   <h2 className={`font-bold text-lg ${colors.text}`}>
                     {characterStats?.hero_name || user?.email?.split('@')[0] || 'Hero'}
                   </h2>
-                  <p className="text-sm text-purple-400">Level {characterStats?.level || 1} Superhero</p>
+                  <p className={`text-sm ${colors.subText}`}>Level {characterStats?.level || 1} Superhero</p>
                 </div>
               </div>
             </div>
             
             <ScrollArea className="h-[350px]">
-              <div className="p-4 border-b border-purple-800">
-                <h3 className="font-semibold text-purple-300 text-sm mb-3">HERO STATS</h3>
+              <div className={`p-4 border-b ${colors.border}`}>
+                <h3 className={`font-semibold ${colors.text} text-sm mb-3`}>HERO STATS</h3>
                 <div className="space-y-3">
                   {heroStats.map((stat) => (
                     <div key={stat.name}>
                       <div className="flex justify-between text-xs">
-                        <span className="text-purple-400">{stat.name}</span>
-                        <span className="text-purple-200">{stat.value}/100</span>
+                        <span className={colors.subText}>{stat.name}</span>
+                        <span className={colors.text}>{stat.value}/100</span>
                       </div>
-                      <div className="w-full bg-purple-950 rounded-full h-1.5 mt-1">
+                      <div className={`w-full ${colors.progBg} rounded-full h-1.5 mt-1`}>
                         <div 
                           className="bg-game-accent h-1.5 rounded-full" 
                           style={{ width: `${stat.value}%` }}
@@ -196,12 +212,12 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
               </div>
               
               <div className="p-4">
-                <h3 className="font-semibold text-purple-300 text-sm mb-3">HERO ABILITIES</h3>
+                <h3 className={`font-semibold ${colors.text} text-sm mb-3`}>HERO ABILITIES</h3>
                 <div className="space-y-2">
                   {abilities.map((ability) => (
-                    <div key={ability.name} className="flex items-center space-x-2 bg-purple-950/50 p-2 rounded">
+                    <div key={ability.name} className={`flex items-center space-x-2 ${colors.progBg}/50 p-2 rounded`}>
                       {ability.icon}
-                      <span className="text-sm text-purple-200">{ability.name}</span>
+                      <span className={`text-sm ${colors.text}`}>{ability.name}</span>
                     </div>
                   ))}
                 </div>
@@ -217,8 +233,8 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
           {navigationTabs.map((tab) => (
             <li key={tab.name}>
               <button 
-                className={`w-full text-left px-3 py-2 rounded flex items-center space-x-3 hover:bg-purple-900 hover:text-purple-200 transition-colors ${
-                  isActivePath(tab.path) ? "bg-purple-900 text-purple-200" : "text-purple-400"
+                className={`w-full text-left px-3 py-2 rounded flex items-center space-x-3 transition-colors ${
+                  isActivePath(tab.path) ? colors.navActive : colors.navButton
                 }`}
                 onClick={() => handleNavigation(tab.path)}
               >
@@ -233,27 +249,27 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
               <Popover>
                 <PopoverTrigger asChild>
                   <button 
-                    className={`w-full text-left px-3 py-2 rounded flex items-center justify-between hover:bg-purple-900 hover:text-purple-200 transition-colors ${
-                      location.pathname.includes('/admin') ? "bg-purple-900 text-purple-200" : "text-purple-400"
+                    className={`w-full text-left px-3 py-2 rounded flex items-center justify-between transition-colors ${
+                      location.pathname.includes('/admin') ? colors.navActive : colors.navButton
                     }`}
                   >
                     <div className="flex items-center space-x-3">
                       <span><Shield size={18} /></span>
                       <span className="font-mono text-sm">Admin</span>
                     </div>
-                    <ChevronRight size={16} className="text-purple-400" />
+                    <ChevronRight size={16} className={colors.subText} />
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-64 p-0 bg-purple-900 border border-purple-800" align="end" side="right">
-                  <div className="p-3 bg-purple-950 border-b border-purple-900/80">
-                    <h3 className="font-semibold text-purple-300 text-sm">ADMIN OPTIONS</h3>
+                <PopoverContent className={`w-64 p-0 ${colors.bg} border ${colors.border}`} align="end" side="right">
+                  <div className={`p-3 ${colors.headerBg} border-b ${colors.border}`}>
+                    <h3 className={`font-semibold ${colors.text} text-sm`}>ADMIN OPTIONS</h3>
                   </div>
                   <div className="p-2">
                     {adminOptions.map((option) => (
                       <button 
                         key={option.name}
-                        className={`w-full text-left px-3 py-2 rounded flex items-center space-x-3 hover:bg-purple-800 transition-colors ${
-                          isActivePath(option.path) ? "bg-purple-800 text-purple-200" : "text-purple-300"
+                        className={`w-full text-left px-3 py-2 rounded flex items-center space-x-3 hover:${colors.navActive.split(' ')[0]} transition-colors ${
+                          isActivePath(option.path) ? colors.navActive : colors.navButton
                         }`}
                         onClick={() => handleNavigation(option.path)}
                       >
@@ -270,7 +286,7 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
           <li>
             <Button 
               variant="ghost"
-              className="w-full text-left px-3 py-2 rounded flex items-center space-x-3 hover:bg-purple-900 hover:text-purple-200 transition-colors text-purple-400"
+              className={`w-full text-left px-3 py-2 rounded flex items-center space-x-3 transition-colors ${colors.navButton}`}
               onClick={signOut}
             >
               <span><LogOut size={18} /></span>
@@ -282,12 +298,12 @@ const GameSidebar: React.FC<GameSidebarProps> = ({
       
       <div className={`mt-auto p-4 border-t ${colors.border}`}>
         <h3 className={`font-semibold ${colors.text} text-sm mb-2`}>CURRENT MISSION</h3>
-        <p className="text-sm text-purple-200">Stop the bank robbery downtown</p>
+        <p className={`text-sm ${colors.missionText}`}>Stop the bank robbery downtown</p>
         <div className="flex items-center space-x-2 mt-2">
-          <div className="w-full bg-purple-950 rounded-full h-1.5">
+          <div className={`w-full ${colors.progBg} rounded-full h-1.5`}>
             <div className="bg-yellow-500 h-1.5 rounded-full w-2/3"></div>
           </div>
-          <span className="text-xs text-purple-400">66%</span>
+          <span className={`text-xs ${colors.subText}`}>66%</span>
         </div>
       </div>
     </div>

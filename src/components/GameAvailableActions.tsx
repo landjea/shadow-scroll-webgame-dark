@@ -23,17 +23,20 @@ const GameAvailableActions: React.FC<GameAvailableActionsProps> = ({
         return {
           title: 'text-batman-gold',
           text: 'text-gray-300',
+          container: 'bg-batman-dark'
         };
       case 'superman':
         return {
           title: 'text-superman-red',
           text: 'text-blue-100',
+          container: 'bg-superman-blue'
         };
       case 'starfire':
       default:
         return {
           title: 'text-purple-300',
           text: 'text-purple-200',
+          container: 'bg-purple-950'
         };
     }
   };
