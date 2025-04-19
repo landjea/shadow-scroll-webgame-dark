@@ -48,7 +48,7 @@ const GameAvailableActions: React.FC<GameAvailableActionsProps> = ({
           <GameActionButton
             key={action.id}
             action={action}
-            onClick={() => onAction(action)}
+            onAction={() => onAction(action)}
             heroEnergy={heroEnergy}
           />
         ))}

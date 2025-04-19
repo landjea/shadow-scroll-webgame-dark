@@ -5,14 +5,16 @@ import { useTheme } from '@/contexts/ThemeContext';
 
 interface GameActionButtonProps {
   action: GameAction;
-  onAction: (actionId: string) => void;
+  onAction: () => void;
   disabled?: boolean;
+  heroEnergy?: number;
 }
 
 const GameActionButton: React.FC<GameActionButtonProps> = ({ 
   action, 
   onAction, 
-  disabled = false 
+  disabled = false,
+  heroEnergy
 }) => {
   const { theme } = useTheme();
 
@@ -51,10 +53,9 @@ const GameActionButton: React.FC<GameActionButtonProps> = ({
 
   return (
     <button
-      key={action.id}
-      onClick={() => onAction(action.id)}
+      onClick={onAction}
       className={`${colors.bg} ${colors.hoverBg} rounded-lg p-2 transition-all flex items-start space-x-2 text-left disabled:opacity-50 disabled:cursor-not-allowed`}
-      disabled={disabled}
+      disabled={disabled || (heroEnergy !== undefined && heroEnergy < 10)}
     >
       <div className={`${colors.iconBg} p-2 rounded-full`}>
         {action.icon}

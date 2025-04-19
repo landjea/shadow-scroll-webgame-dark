@@ -8,6 +8,7 @@ import CityGrid from './CityGrid';
 import GameAvailableActions from './GameAvailableActions';
 import GameActionLog from './GameActionLog';
 import { useGameState } from '@/hooks/useGameState';
+import { GameAction } from '@/types/game';
 
 const Game: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,6 +66,11 @@ const Game: React.FC = () => {
 
   const styles = getThemeStyles();
 
+  // Create a wrapper for the handleAction function to match the expected type
+  const handleGameAction = (action: GameAction) => {
+    handleAction(action.id);
+  };
+
   return (
     <div className={`h-screen overflow-hidden flex flex-col ${styles.textColor} ${styles.bg}`}>
       <GameHeader 
@@ -101,7 +107,7 @@ const Game: React.FC = () => {
               <div className="space-y-4">
                 <GameAvailableActions 
                   actions={gameActions} 
-                  onAction={handleAction} 
+                  onAction={handleGameAction} 
                   heroEnergy={heroEnergy}
                 />
                 <GameActionLog entries={actionLog} />
