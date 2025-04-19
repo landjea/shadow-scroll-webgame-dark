@@ -8,7 +8,6 @@ import CityGrid from './CityGrid';
 import GameAvailableActions from './GameAvailableActions';
 import GameActionLog from './GameActionLog';
 import { useGameState } from '@/hooks/useGameState';
-import ThemeDebug from './ThemeDebug';
 
 const Game: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -45,13 +44,13 @@ const Game: React.FC = () => {
       case 'batman':
         return {
           bg: 'bg-batman-dark',
-          borderColor: 'border-gray-800/50',
+          borderColor: 'border-batman-border',
           textColor: 'text-gray-200'
         };
       case 'superman':
         return {
           bg: 'bg-superman-blue',
-          borderColor: 'border-blue-800/50',
+          borderColor: 'border-superman-border',
           textColor: 'text-blue-50'
         };
       case 'starfire':
@@ -111,11 +110,8 @@ const Game: React.FC = () => {
           </div>
         </main>
       </div>
-      
-      <ThemeDebug />
     </div>
   );
 };
 
 export default Game;
-
